@@ -1,4 +1,5 @@
 #pragma once
+#include "AppSettings.h"
 
 namespace Yakuniyloyiha {
 
@@ -395,13 +396,13 @@ namespace Yakuniyloyiha {
 
 			this->lblLibraryLat->AutoSize = true;
 			this->lblLibraryLat->Location = System::Drawing::Point(10, 70);
-			this->lblLibraryLat->Text = L"Kenglik (masalan 41.31):";
+			this->lblLibraryLat->Text = L"Kenglik (majburiy, masalan 41.31):";
 			this->txtLibraryLat->Location = System::Drawing::Point(10, 90);
 			this->txtLibraryLat->Size = System::Drawing::Size(200, 22);
 
 			this->lblLibraryLon->AutoSize = true;
 			this->lblLibraryLon->Location = System::Drawing::Point(10, 120);
-			this->lblLibraryLon->Text = L"Uzunlik (masalan 69.24):";
+			this->lblLibraryLon->Text = L"Uzunlik (majburiy, masalan 69.24):";
 			this->txtLibraryLon->Location = System::Drawing::Point(10, 140);
 			this->txtLibraryLon->Size = System::Drawing::Size(200, 22);
 
@@ -696,57 +697,61 @@ namespace Yakuniyloyiha {
 #pragma endregion
 
 	private: System::Void ApplyModernStyle() {
-		this->BackColor = System::Drawing::Color::White;
+		Color pageBg = AppSettings::PageBackColor();
+		Color surface = AppSettings::SurfaceColor();
+		Color elevated = AppSettings::ElevatedColor();
+		Color text = AppSettings::TextColor();
+		Color muted = AppSettings::MutedTextColor();
+		Color primary = AppSettings::PrimaryColor();
+		this->BackColor = pageBg;
+		this->ForeColor = text;
 		this->Font = (gcnew System::Drawing::Font(L"Segoe UI", 10.0F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
 
 		// TabControl dizayni
 		tabControl1->ItemSize = System::Drawing::Size(130, 40);
 		tabControl1->SizeMode = System::Windows::Forms::TabSizeMode::Fixed;
-		tabPageBooks->BackColor = System::Drawing::Color::White;
-		tabPageLibraries->BackColor = System::Drawing::Color::White;
-		tabPageSections->BackColor = System::Drawing::Color::White;
-		tabPageReaders->BackColor = System::Drawing::Color::White;
-		tabPageIssues->BackColor = System::Drawing::Color::White;
-		tabPageInsights->BackColor = System::Drawing::Color::White;
+		tabControl1->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 9.5F, System::Drawing::FontStyle::Bold);
+		tabPageBooks->BackColor = pageBg;
+		tabPageLibraries->BackColor = pageBg;
+		tabPageSections->BackColor = pageBg;
+		tabPageReaders->BackColor = pageBg;
+		tabPageIssues->BackColor = pageBg;
+		tabPageInsights->BackColor = pageBg;
 
 		// Tugmalar (Buttons)
      array<Button^>^ buttons = { btnAddBook, btnEditBook, btnAddLibrary, btnAddSection, btnDeleteBook, btnDeleteLibrary, btnDeleteSection, btnSelectImage, btnSelectEbook, btnAddReader, btnDeleteReader, btnApproveReader, btnRejectReader, btnIssueBook, btnReturnBook };
 		for each (Button^ btn in buttons) {
-			btn->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
-			btn->FlatAppearance->BorderSize = 0;
-			btn->Font = (gcnew System::Drawing::Font(L"Segoe UI", 10.0F, System::Drawing::FontStyle::Bold));
-			btn->ForeColor = System::Drawing::Color::White;
-			btn->Cursor = System::Windows::Forms::Cursors::Hand;
+			AppSettings::StyleButton(btn, primary, System::Drawing::Color::White);
 			btn->Height = 35;
 		}
 
 		// Qo'shish va O'chirish ranglari
-		btnAddBook->BackColor = System::Drawing::Color::FromArgb(40, 167, 69);
-		btnAddLibrary->BackColor = System::Drawing::Color::FromArgb(40, 167, 69);
-		btnAddSection->BackColor = System::Drawing::Color::FromArgb(40, 167, 69);
-		btnAddReader->BackColor = System::Drawing::Color::FromArgb(40, 167, 69);
-		btnIssueBook->BackColor = System::Drawing::Color::FromArgb(23, 162, 184);
+		btnAddBook->BackColor = AppSettings::SuccessColor();
+		btnAddLibrary->BackColor = AppSettings::SuccessColor();
+		btnAddSection->BackColor = AppSettings::SuccessColor();
+		btnAddReader->BackColor = AppSettings::SuccessColor();
+		btnIssueBook->BackColor = System::Drawing::Color::FromArgb(14, 165, 233);
 
-		btnEditBook->BackColor = System::Drawing::Color::FromArgb(255, 193, 7);
+		btnEditBook->BackColor = AppSettings::WarningColor();
 
-		btnDeleteBook->BackColor = System::Drawing::Color::FromArgb(220, 53, 69);
-		btnDeleteLibrary->BackColor = System::Drawing::Color::FromArgb(220, 53, 69);
-		btnDeleteSection->BackColor = System::Drawing::Color::FromArgb(220, 53, 69);
-		btnDeleteReader->BackColor = System::Drawing::Color::FromArgb(220, 53, 69);
-		btnApproveReader->BackColor = System::Drawing::Color::FromArgb(40, 167, 69);
-		btnRejectReader->BackColor = System::Drawing::Color::FromArgb(220, 53, 69);
-		btnReturnBook->BackColor = System::Drawing::Color::FromArgb(255, 193, 7);
+		btnDeleteBook->BackColor = AppSettings::DangerColor();
+		btnDeleteLibrary->BackColor = AppSettings::DangerColor();
+		btnDeleteSection->BackColor = AppSettings::DangerColor();
+		btnDeleteReader->BackColor = AppSettings::DangerColor();
+		btnApproveReader->BackColor = AppSettings::SuccessColor();
+		btnRejectReader->BackColor = AppSettings::DangerColor();
+		btnReturnBook->BackColor = AppSettings::WarningColor();
 
 		if (lblReadersPageTitle != nullptr) {
 			lblReadersPageTitle->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 12.0F, System::Drawing::FontStyle::Bold);
-			lblReadersPageTitle->ForeColor = System::Drawing::Color::FromArgb(33, 37, 41);
+			lblReadersPageTitle->ForeColor = text;
 		}
 		if (lblReadersPageHint != nullptr) {
-			lblReadersPageHint->ForeColor = System::Drawing::Color::FromArgb(108, 117, 125);
+			lblReadersPageHint->ForeColor = muted;
 		}
 
-		btnSelectImage->BackColor = System::Drawing::Color::FromArgb(0, 123, 255);
-		btnSelectEbook->BackColor = System::Drawing::Color::FromArgb(111, 66, 193);
+		btnSelectImage->BackColor = primary;
+		btnSelectEbook->BackColor = System::Drawing::Color::FromArgb(124, 58, 237);
 
 		// 3D style dashboard cards
 		pnlCardTotal->Tag = gcnew cli::array<System::Drawing::Color>(2) { System::Drawing::Color::FromArgb(33, 150, 243), System::Drawing::Color::FromArgb(21, 101, 192) };
@@ -789,9 +794,7 @@ namespace Yakuniyloyiha {
 		// Vidjetlar dizayni
 		array<Control^>^ inputs = { txtBookName, cmbBookLibrary, cmbBookSection, txtBookShelf, txtBookRow, txtLibraryName, txtLibraryLat, txtLibraryLon, txtSectionName, txtReaderName, txtReaderPhone, txtReaderID, cmbIssueReader, cmbIssueBook, dtpReturnDate };
 		for each (Control^ ctrl in inputs) {
-			if (ctrl->GetType() == TextBox::typeid) {
-				(safe_cast<TextBox^>(ctrl))->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
-			}
+			AppSettings::StyleInput(ctrl);
 			ctrl->Font = (gcnew System::Drawing::Font(L"Segoe UI", 11.0F));
 			ctrl->Height = 30;
 		}
@@ -799,24 +802,14 @@ namespace Yakuniyloyiha {
 		// Jadvallar (DataGridView) dizayni
         array<DataGridView^>^ dgvs = { dgvBooks, dgvLibraries, dgvSections, dgvReaders, dgvIssues, dgvDemand };
 		for each (DataGridView^ dgv in dgvs) {
-			dgv->BackgroundColor = System::Drawing::Color::White;
-			dgv->BorderStyle = System::Windows::Forms::BorderStyle::None;
-			dgv->CellBorderStyle = System::Windows::Forms::DataGridViewCellBorderStyle::SingleHorizontal;
-			dgv->DefaultCellStyle->SelectionBackColor = System::Drawing::Color::FromArgb(238, 245, 255);
-			dgv->DefaultCellStyle->SelectionForeColor = System::Drawing::Color::Black;
-			dgv->DefaultCellStyle->Font = (gcnew System::Drawing::Font(L"Segoe UI", 10.0F));
-			dgv->RowHeadersVisible = false;
-			dgv->AutoSizeColumnsMode = System::Windows::Forms::DataGridViewAutoSizeColumnsMode::Fill;
-			dgv->EnableHeadersVisualStyles = false;
-			dgv->ColumnHeadersBorderStyle = System::Windows::Forms::DataGridViewHeaderBorderStyle::None;
-			dgv->ColumnHeadersDefaultCellStyle->BackColor = System::Drawing::Color::FromArgb(240, 240, 240);
-			dgv->ColumnHeadersDefaultCellStyle->ForeColor = System::Drawing::Color::Black;
-			dgv->ColumnHeadersDefaultCellStyle->Font = (gcnew System::Drawing::Font(L"Segoe UI", 10.0F, System::Drawing::FontStyle::Bold));
-			dgv->ColumnHeadersHeight = 40;
-			dgv->RowTemplate->Height = 35;
-			dgv->SelectionMode = System::Windows::Forms::DataGridViewSelectionMode::FullRowSelect;
-			dgv->AllowUserToAddRows = false;
-			dgv->ReadOnly = true;
+			AppSettings::StyleGrid(dgv);
+		}
+
+		array<Label^>^ labels = { lblBookName, lblBookLibrary, lblBookSection, lblBookShelf, lblBookRow, lblLibraryName, lblLibraryLat, lblLibraryLon, lblSectionName };
+		for each (Label^ lbl in labels) {
+			if (lbl == nullptr) continue;
+			lbl->ForeColor = muted;
+			lbl->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 9.0F, System::Drawing::FontStyle::Bold);
 		}
 
 		UpdateBooksTabLayout();
@@ -1524,8 +1517,21 @@ namespace Yakuniyloyiha {
 			MessageBox::Show(L"Kutubxona nomini kiriting!");
 			return;
 		}
-		String^ lat = txtLibraryLat->Text == L"" ? L"41.3110" : txtLibraryLat->Text;
-		String^ lon = txtLibraryLon->Text == L"" ? L"69.2401" : txtLibraryLon->Text;
+		if (String::IsNullOrWhiteSpace(txtLibraryLat->Text) || String::IsNullOrWhiteSpace(txtLibraryLon->Text)) {
+			MessageBox::Show(L"Masofa to'g'ri chiqishi uchun kutubxonaning kenglik va uzunlik koordinatalarini kiriting.");
+			return;
+		}
+
+		String^ lat = txtLibraryLat->Text->Trim()->Replace(L",", L".");
+		String^ lon = txtLibraryLon->Text->Trim()->Replace(L",", L".");
+		double latValue = 0;
+		double lonValue = 0;
+		if (!Double::TryParse(lat, System::Globalization::NumberStyles::Float, System::Globalization::CultureInfo::InvariantCulture, latValue) ||
+			!Double::TryParse(lon, System::Globalization::NumberStyles::Float, System::Globalization::CultureInfo::InvariantCulture, lonValue) ||
+			latValue < -90 || latValue > 90 || lonValue < -180 || lonValue > 180) {
+			MessageBox::Show(L"Koordinatalarni to'g'ri formatda kiriting. Masalan: 41.3110 va 69.2401");
+			return;
+		}
 
 		try {
 			WebClient^ client = gcnew WebClient();

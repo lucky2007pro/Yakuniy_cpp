@@ -340,7 +340,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		if (km < 0) return L"";
 		if (km < 1.0) {
 			int meters = Math::Max(1, static_cast<int>(Math::Round(km * 1000.0)));
-			return meters.ToString() + L" m";
+			return System::Convert::ToString(meters) + L" m";
 		}
 		if (km < 10.0) {
 			return Math::Round(km, 2).ToString(System::Globalization::CultureInfo::InvariantCulture) + L" km";
@@ -572,11 +572,11 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 	}
 
 	private: System::Void ApplyModernStyle() {
-		Color darkBg = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(20, 24, 28) : System::Drawing::Color::FromArgb(246, 248, 252);
-		Color panelBg = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(32, 38, 46) : System::Drawing::Color::FromArgb(255, 255, 255);
-		Color accentColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(76, 144, 255) : System::Drawing::Color::FromArgb(37, 99, 235);
-		Color textColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(236, 240, 241) : System::Drawing::Color::FromArgb(33, 37, 41);
-		Color textMuted = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(170, 176, 180) : System::Drawing::Color::FromArgb(108, 117, 125);
+		Color darkBg = AppSettings::PageBackColor();
+		Color panelBg = AppSettings::SurfaceColor();
+		Color accentColor = AppSettings::PrimaryColor();
+		Color textColor = AppSettings::TextColor();
+		Color textMuted = AppSettings::MutedTextColor();
 
 		this->Text = AppSettings::Translate(L"Kutubxona Tizimi", L"Library System", L"Библиотечная система");
 		lblSearch->Text = AppSettings::Translate(L"Kitob nomi (qidiruv):", L"Book title (search):", L"Название книги (поиск):");
@@ -632,7 +632,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				btn->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
 				btn->FlatAppearance->BorderSize = 0;
 				btn->Font = (gcnew System::Drawing::Font(L"Segoe UI Semibold", 10.0F, System::Drawing::FontStyle::Bold));
-				btn->ForeColor = textColor;
+				btn->ForeColor = System::Drawing::Color::White;
 				btn->Cursor = System::Windows::Forms::Cursors::Hand;
 				btn->Height = 35;
 			}
@@ -641,7 +641,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		btnSearch->Location = System::Drawing::Point(510, 20);
 		btnSearch->Size = System::Drawing::Size(80, 35);
 		btnSearch->BackColor = accentColor;
-		btnSearch->ForeColor = System::Drawing::Color::White;
+		btnSearch->ForeColor = AppSettings::PrimaryTextColor();
 		btnSearch->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
 
 		btnReader->Location = System::Drawing::Point(600, 20);
@@ -679,7 +679,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		btnAdmin->Location = System::Drawing::Point(1095, 20);
 		btnAdmin->Size = System::Drawing::Size(100, 35);
 		btnAdmin->BackColor = accentColor;
-		btnAdmin->ForeColor = System::Drawing::Color::White;
+		btnAdmin->ForeColor = AppSettings::PrimaryTextColor();
 		btnAdmin->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
 
 		lblFilterLib->Text = AppSettings::Translate(L"Kutubxona:", L"Library:", L"Библиотека:");
@@ -714,7 +714,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				? AppSettings::Translate(L"Joylashuv: aniqlandi", L"Location: detected", L"Геолокация: определена")
 				: AppSettings::Translate(L"Joylashuv: Toshkent bo'yicha", L"Location: Tashkent fallback", L"Геолокация: по Ташкенту");
 			lblLocationStatus->ForeColor = isLocationFetched
-				? (AppSettings::DarkMode ? System::Drawing::Color::FromArgb(95, 220, 140) : System::Drawing::Color::FromArgb(20, 140, 82))
+				? AppSettings::SuccessColor()
 				: textMuted;
 			lblLocationStatus->Font = gcnew System::Drawing::Font(L"Segoe UI", 9.0F, System::Drawing::FontStyle::Regular);
 		}
@@ -758,10 +758,10 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			MakeRounded(sb, 12);
 		}
 
-		Color chipBg = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(46, 54, 64) : System::Drawing::Color::FromArgb(232, 236, 243);
-		Color chipFg = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(220, 225, 230) : System::Drawing::Color::FromArgb(60, 70, 85);
-		Color chipActiveBg = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(37, 99, 235) : System::Drawing::Color::FromArgb(37, 99, 235);
-		Color chipActiveFg = System::Drawing::Color::White;
+		Color chipBg = AppSettings::ElevatedColor();
+		Color chipFg = textMuted;
+		Color chipActiveBg = accentColor;
+		Color chipActiveFg = AppSettings::PrimaryTextColor();
 
 		btnStatusAll->BackColor = activeStatusFilter == L"all" ? chipActiveBg : chipBg;
 		btnStatusAll->ForeColor = activeStatusFilter == L"all" ? chipActiveFg : chipFg;
@@ -779,7 +779,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		lblMarquee->Text = AppSettings::Translate(L"TATU Library • Online band qilish mavjud", L"TATU Library • Online reservation available", L"Библиотека ТАТУ • Доступно онлайн-бронирование");
 		lblMarquee->AutoSize = true;
 		lblMarquee->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 12.0F, System::Drawing::FontStyle::Bold);
-		lblMarquee->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(120, 190, 255) : System::Drawing::Color::FromArgb(26, 115, 232);
+		lblMarquee->ForeColor = accentColor;
 		lblMarquee->BackColor = System::Drawing::Color::Transparent;
         lblMarquee->Location = System::Drawing::Point(-lblMarquee->PreferredWidth, 136);
 
@@ -1038,14 +1038,14 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			if (results->Count == 0) {
 				Panel^ emptyCard = gcnew Panel();
 				emptyCard->Size = System::Drawing::Size(Math::Max(420, flpResults->ClientSize.Width - 80), 160);
-				emptyCard->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(40, 45, 52) : System::Drawing::Color::White;
+				emptyCard->BackColor = AppSettings::SurfaceColor();
 				emptyCard->Margin = System::Windows::Forms::Padding(18);
 				MakeRounded(emptyCard, 14);
 
 				Label^ emptyTitle = gcnew Label();
 				emptyTitle->Text = AppSettings::Translate(L"Hech narsa topilmadi", L"No results found", L"Ничего не найдено");
 				emptyTitle->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 13.0F, System::Drawing::FontStyle::Bold);
-				emptyTitle->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(230, 233, 238) : System::Drawing::Color::FromArgb(33, 37, 41);
+				emptyTitle->ForeColor = AppSettings::TextColor();
 				emptyTitle->Location = System::Drawing::Point(20, 24);
 				emptyTitle->AutoSize = true;
 
@@ -1056,7 +1056,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 					L"Попробуйте смягчить фильтры или очистить поиск."
 				);
 				emptyHint->Font = gcnew System::Drawing::Font(L"Segoe UI", 10.0F, System::Drawing::FontStyle::Regular);
-				emptyHint->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(170, 176, 180) : System::Drawing::Color::FromArgb(108, 117, 125);
+				emptyHint->ForeColor = AppSettings::MutedTextColor();
 				emptyHint->Location = System::Drawing::Point(22, 62);
 				emptyHint->AutoSize = true;
 
@@ -1076,7 +1076,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				array<Object^>^ res = results[i];
 				Panel^ card = gcnew Panel();
 				card->Size = System::Drawing::Size(cardWidth, cardHeight);
-				card->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(40, 45, 52) : System::Drawing::Color::White;
+				card->BackColor = AppSettings::SurfaceColor();
 				card->Margin = System::Windows::Forms::Padding(12);
 				MakeRounded(card, 12);
 				card->Cursor = Cursors::Hand;
@@ -1087,7 +1087,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				pb->Location = System::Drawing::Point(0, 0);
 				pb->SizeMode = PictureBoxSizeMode::StretchImage;
 				pb->Image = dynamic_cast<Image^>(res[0]);
-				if (pb->Image == emptyImage) { pb->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(58, 65, 76) : System::Drawing::Color::FromArgb(226, 232, 240); }
+				if (pb->Image == emptyImage) { pb->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(20, 27, 42) : System::Drawing::Color::FromArgb(226, 232, 240); }
 
 				Label^ lblTitle = gcnew Label();
 				lblTitle->Name = L"title";
@@ -1095,13 +1095,13 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				lblTitle->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 11.5F, System::Drawing::FontStyle::Bold);
 				lblTitle->Size = System::Drawing::Size(cardWidth - 20, 45);
 				lblTitle->Location = System::Drawing::Point(10, imageHeight + 10);
-				lblTitle->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(236, 240, 241) : System::Drawing::Color::FromArgb(24, 30, 38);
+				lblTitle->ForeColor = AppSettings::TextColor();
 
 				Label^ lblDist = gcnew Label();
 				lblDist->Name = L"distance";
 				lblDist->Text = AppSettings::Translate(L"Yaqinlik: ", L"Distance: ", L"Расстояние: ") + res[6]->ToString() + L" • " + res[2]->ToString();
 				lblDist->Font = gcnew System::Drawing::Font(L"Segoe UI", 9.0F, System::Drawing::FontStyle::Regular);
-				lblDist->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(170, 176, 180) : System::Drawing::Color::FromArgb(108, 117, 125);
+				lblDist->ForeColor = AppSettings::MutedTextColor();
 				lblDist->Location = System::Drawing::Point(10, imageHeight + 60);
 				lblDist->Size = System::Drawing::Size(cardWidth - 20, 22);
 				lblDist->AutoEllipsis = true;
@@ -1113,13 +1113,13 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				lblStat->Location = System::Drawing::Point(10, imageHeight + 88);
 				String^ statusText = res[7]->ToString();
 				if (statusText == AppSettings::Translate(L"Berilgan", L"Issued", L"Выдано")) {
-					lblStat->ForeColor = System::Drawing::Color::FromArgb(255, 99, 132);
+					lblStat->ForeColor = AppSettings::DangerColor();
 				}
 				else if (statusText == AppSettings::Translate(L"Band qilingan", L"Reserved", L"Забронировано")) {
-					lblStat->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(255, 201, 87) : System::Drawing::Color::FromArgb(240, 156, 0);
+					lblStat->ForeColor = AppSettings::WarningColor();
 				}
 				else {
-					lblStat->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(95, 220, 140) : System::Drawing::Color::FromArgb(46, 204, 113);
+					lblStat->ForeColor = AppSettings::SuccessColor();
 				}
 				lblStat->AutoSize = true;
 
@@ -1129,7 +1129,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 					AppSettings::Translate(L"Javon ", L"Shelf ", L"Стеллаж ") + res[4]->ToString() + L" / " +
 					AppSettings::Translate(L"qator ", L"row ", L"ряд ") + res[5]->ToString();
 				lblMeta->Font = gcnew System::Drawing::Font(L"Segoe UI", 8.8F, System::Drawing::FontStyle::Regular);
-				lblMeta->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(148, 163, 184) : System::Drawing::Color::FromArgb(100, 116, 139);
+				lblMeta->ForeColor = AppSettings::MutedTextColor();
 				lblMeta->Location = System::Drawing::Point(10, imageHeight + 116);
 				lblMeta->Size = System::Drawing::Size(cardWidth - 20, 22);
 				lblMeta->AutoEllipsis = true;
@@ -1141,8 +1141,8 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				btnMiniRoute->Size = System::Drawing::Size((cardWidth - 30) / 2, 30);
 				btnMiniRoute->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
 				btnMiniRoute->FlatAppearance->BorderSize = 0;
-				btnMiniRoute->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(37, 99, 235) : System::Drawing::Color::FromArgb(37, 99, 235);
-				btnMiniRoute->ForeColor = System::Drawing::Color::White;
+				btnMiniRoute->BackColor = AppSettings::PrimaryColor();
+				btnMiniRoute->ForeColor = AppSettings::PrimaryTextColor();
 				btnMiniRoute->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 8.8F, System::Drawing::FontStyle::Bold);
 				btnMiniRoute->Cursor = Cursors::Hand;
 				MakeRounded(btnMiniRoute, 8);
@@ -1154,8 +1154,8 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				btnMiniOpen->Size = System::Drawing::Size((cardWidth - 30) / 2, 30);
 				btnMiniOpen->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
 				btnMiniOpen->FlatAppearance->BorderSize = 0;
-				btnMiniOpen->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(51, 65, 85) : System::Drawing::Color::FromArgb(226, 232, 240);
-				btnMiniOpen->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::White : System::Drawing::Color::FromArgb(30, 41, 59);
+				btnMiniOpen->BackColor = AppSettings::ElevatedColor();
+				btnMiniOpen->ForeColor = AppSettings::TextColor();
 				btnMiniOpen->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 8.8F, System::Drawing::FontStyle::Bold);
 				btnMiniOpen->Cursor = Cursors::Hand;
 				MakeRounded(btnMiniOpen, 8);
@@ -1226,7 +1226,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		Panel^ card = dynamic_cast<Panel^>(c);
 		if (card == nullptr) card = dynamic_cast<Panel^>(c->Parent);
 		if (card == nullptr) return;
-		card->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(52, 58, 66) : System::Drawing::Color::FromArgb(242, 248, 255);
+		card->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(26, 45, 62) : System::Drawing::Color::FromArgb(239, 246, 255);
 	}
 
 	private: System::Void Card_MouseLeave(System::Object^ sender, System::EventArgs^ e) {
@@ -1235,7 +1235,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		Panel^ card = dynamic_cast<Panel^>(c);
 		if (card == nullptr) card = dynamic_cast<Panel^>(c->Parent);
 		if (card == nullptr) return;
-		card->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(40, 45, 52) : System::Drawing::Color::White;
+		card->BackColor = AppSettings::SurfaceColor();
 	}
 
 	private: System::Void ShowLoadingSkeleton(int count) {
@@ -2294,7 +2294,9 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 
 		String^ lat = res[9]->ToString();
 		String^ lon = res[10]->ToString();
-		String^ url = L"https://www.google.com/maps?q=" + lat + L"," + lon;
+		String^ origin = userLat.ToString(System::Globalization::CultureInfo::InvariantCulture) + L"," + userLon.ToString(System::Globalization::CultureInfo::InvariantCulture);
+		String^ destination = lat + L"," + lon;
+		String^ url = L"https://www.google.com/maps/dir/?api=1&origin=" + origin + L"&destination=" + destination + L"&travelmode=walking";
 		Process::Start(url);
 	}
 
@@ -2312,6 +2314,11 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				MessageBoxButtons::OK,
 				MessageBoxIcon::Information
 			);
+			return;
+		}
+
+		if (ebookPath->StartsWith(L"http://") || ebookPath->StartsWith(L"https://")) {
+			Process::Start(ebookPath);
 			return;
 		}
 
