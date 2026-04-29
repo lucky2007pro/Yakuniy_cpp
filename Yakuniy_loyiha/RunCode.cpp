@@ -1,4 +1,5 @@
 #include "MyForm.h"
+#include "AppSettings.h"
 
 using namespace System;
 using namespace System::Windows::Forms;
@@ -8,6 +9,7 @@ int main(array<String^>^ args)
 {
 	Application::EnableVisualStyles();
 	Application::SetCompatibleTextRenderingDefault(false);
+	Yakuniyloyiha::AppSettings::Load();
 	Yakuniyloyiha::MyForm form;
 	Application::Run(% form);
 	return 0;

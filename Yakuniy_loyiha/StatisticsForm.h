@@ -1,4 +1,5 @@
 #pragma once
+#include "AppSettings.h"
 
 namespace Yakuniyloyiha {
 
@@ -15,19 +16,19 @@ namespace Yakuniyloyiha {
 	public:
 		StatisticsForm(void)
 		{
-			this->Text = L"Statistika";
+			this->Text = AppSettings::Translate(L"Statistika", L"Statistics", L"Статистика");
 			this->Size = System::Drawing::Size(400, 350);
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
 			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedDialog;
 			this->MaximizeBox = false;
 			this->MinimizeBox = false;
-			this->BackColor = System::Drawing::Color::White;
+			this->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(24, 26, 27) : System::Drawing::Color::White;
 			this->Font = gcnew System::Drawing::Font(L"Segoe UI", 10.0F);
 
 			Label^ titleLabel = gcnew Label();
-			titleLabel->Text = L"Tizim Statistikasi";
+			titleLabel->Text = AppSettings::Translate(L"Tizim Statistikasi", L"System statistics", L"Статистика системы");
 			titleLabel->Font = gcnew System::Drawing::Font(L"Segoe UI", 16.0F, System::Drawing::FontStyle::Bold);
-			titleLabel->ForeColor = System::Drawing::Color::FromArgb(33, 37, 41);
+			titleLabel->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(236, 240, 241) : System::Drawing::Color::FromArgb(33, 37, 41);
 			titleLabel->AutoSize = true;
 			titleLabel->Location = System::Drawing::Point(30, 30);
 			this->Controls->Add(titleLabel);
@@ -38,13 +39,13 @@ namespace Yakuniyloyiha {
 			int libraries = File::Exists("libraries.txt") ? File::ReadAllLines("libraries.txt")->Length : 0;
 
 			int y = 90;
-			AddStatRow(L"📚 Barcha kitoblar soni:", books.ToString(), y); y += 30;
-			AddStatRow(L"🏢 Kutubxonalar soni:", libraries.ToString(), y); y += 30;
-			AddStatRow(L"👥 Faol kitobxonlar:", readers.ToString(), y); y += 30;
-			AddStatRow(L"⏳ Ijaradagi kitoblar:", issues.ToString(), y); y += 30;
+			AddStatRow(AppSettings::Translate(L"Barcha kitoblar soni:", L"Total books:", L"Всего книг:"), books.ToString(), y); y += 30;
+			AddStatRow(AppSettings::Translate(L"Kutubxonalar soni:", L"Libraries count:", L"Количество библиотек:"), libraries.ToString(), y); y += 30;
+			AddStatRow(AppSettings::Translate(L"Faol kitobxonlar:", L"Active readers:", L"Активные читатели:"), readers.ToString(), y); y += 30;
+			AddStatRow(AppSettings::Translate(L"Ijaradagi kitoblar:", L"Borrowed books:", L"Книги в аренде:"), issues.ToString(), y); y += 30;
 
 			Button^ btnClose = gcnew Button();
-			btnClose->Text = L"Yopish";
+			btnClose->Text = AppSettings::Translate(L"Yopish", L"Close", L"Закрыть");
 			btnClose->Location = System::Drawing::Point(140, y + 30);
 			btnClose->Size = System::Drawing::Size(100, 35);
 			btnClose->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
@@ -56,7 +57,7 @@ namespace Yakuniyloyiha {
 			this->Controls->Add(btnClose);
 
 			Panel^ divider = gcnew Panel();
-			divider->BackColor = System::Drawing::Color::FromArgb(230, 230, 230);
+			divider->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(58, 62, 65) : System::Drawing::Color::FromArgb(230, 230, 230);
 			divider->Location = System::Drawing::Point(30, 80);
 			divider->Size = System::Drawing::Size(330, 1);
 			this->Controls->Add(divider);
@@ -67,7 +68,7 @@ namespace Yakuniyloyiha {
 			Label^ lbl = gcnew Label();
 			lbl->Text = label;
 			lbl->Font = gcnew System::Drawing::Font(L"Segoe UI", 11.0F, System::Drawing::FontStyle::Regular);
-			lbl->ForeColor = System::Drawing::Color::FromArgb(108, 117, 125);
+			lbl->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(170, 176, 180) : System::Drawing::Color::FromArgb(108, 117, 125);
 			lbl->AutoSize = true;
 			lbl->Location = System::Drawing::Point(30, yPos);
 			this->Controls->Add(lbl);
@@ -75,7 +76,7 @@ namespace Yakuniyloyiha {
 			Label^ valLbl = gcnew Label();
 			valLbl->Text = val;
 			valLbl->Font = gcnew System::Drawing::Font(L"Segoe UI", 11.0F, System::Drawing::FontStyle::Bold);
-			valLbl->ForeColor = System::Drawing::Color::FromArgb(33, 37, 41);
+			valLbl->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(236, 240, 241) : System::Drawing::Color::FromArgb(33, 37, 41);
 			valLbl->AutoSize = true;
 			valLbl->Location = System::Drawing::Point(230, yPos);
 			this->Controls->Add(valLbl);
