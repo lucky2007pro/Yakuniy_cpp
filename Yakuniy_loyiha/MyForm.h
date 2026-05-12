@@ -937,12 +937,11 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			client->Encoding = System::Text::Encoding::UTF8;
 			String^ json = client->DownloadString(apiUrl + "books/");
 			
-			// Regex to find book objects in JSON
-			MatchCollection^ books = Regex::Matches(json, "\\{[^{}]+\\}");
+			// Extract book objects in JSON securely
+			System::Collections::Generic::List<String^>^ books = AppSettings::ExtractJsonObjects(json);
 			System::Collections::Generic::List<array<Object^>^>^ results = gcnew System::Collections::Generic::List<array<Object^>^>();
 
-			for each(Match^ m in books) {
-				String^ obj = m->Value;
+			for each(String^ obj in books) {
 				String^ title = Regex::Match(obj, "\"title\":\"([^\"]+)\"")->Groups[1]->Value;
 				String^ libName = Regex::Match(obj, "\"library_name\":\"([^\"]+)\"")->Groups[1]->Value;
 				String^ secName = Regex::Match(obj, "\"section_name\":\"([^\"]+)\"")->Groups[1]->Value;
@@ -2745,32 +2744,6 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		return flp;
 	}
 
-	private: System::Collections::Generic::List<String^>^ ExtractJsonObjects(String^ json) {
-		System::Collections::Generic::List<String^>^ result = gcnew System::Collections::Generic::List<String^>();
-		int braceCount = 0;
-		int startIndex = -1;
-		bool inString = false;
-		for (int i = 0; i < json->Length; i++) {
-			wchar_t c = json[i];
-			if (c == L'"' && (i == 0 || json[i - 1] != L'\\')) {
-				inString = !inString;
-			}
-			if (!inString) {
-				if (c == L'{') {
-					if (braceCount == 0) startIndex = i;
-					braceCount++;
-				} else if (c == L'}') {
-					braceCount--;
-					if (braceCount == 0 && startIndex != -1) {
-						result->Add(json->Substring(startIndex, i - startIndex + 1));
-						startIndex = -1;
-					}
-				}
-			}
-		}
-		return result;
-	}
-
 	// Top kitoblar API'sidan ma'lumotni yuklab, FlowLayoutPanel ichiga karta-qatorlar qo'shadi.
 	private: System::Void LoadTopBooksFlow(FlowLayoutPanel^ flp, String^ endpoint) {
 		if (flp == nullptr) return;
@@ -2804,7 +2777,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		}
 
 		flp->Controls->Clear();
-		System::Collections::Generic::List<String^>^ items = ExtractJsonObjects(json);
+		System::Collections::Generic::List<String^>^ items = AppSettings::ExtractJsonObjects(json);
 
 		if (items->Count == 0) {
 			Label^ lblEmpty = gcnew Label();

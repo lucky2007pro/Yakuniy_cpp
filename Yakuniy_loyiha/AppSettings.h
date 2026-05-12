@@ -189,6 +189,33 @@ namespace Yakuniyloyiha {
 			ctrl->Region = gcnew Region(path);
 		}
 
+		static System::Collections::Generic::List<String^>^ ExtractJsonObjects(String^ json) {
+			System::Collections::Generic::List<String^>^ result = gcnew System::Collections::Generic::List<String^>();
+			if (String::IsNullOrEmpty(json)) return result;
+			int braceCount = 0;
+			int startIndex = -1;
+			bool inString = false;
+			for (int i = 0; i < json->Length; i++) {
+				wchar_t c = json[i];
+				if (c == L'"' && (i == 0 || json[i - 1] != L'\\')) {
+					inString = !inString;
+				}
+				if (!inString) {
+					if (c == L'{') {
+						if (braceCount == 0) startIndex = i;
+						braceCount++;
+					} else if (c == L'}') {
+						braceCount--;
+						if (braceCount == 0 && startIndex != -1) {
+							result->Add(json->Substring(startIndex, i - startIndex + 1));
+							startIndex = -1;
+						}
+					}
+				}
+			}
+			return result;
+		}
+
 		static void StyleButton(Button^ btn, Color backColor, Color foreColor) {
 			if (btn == nullptr) return;
 			btn->FlatStyle = FlatStyle::Flat;

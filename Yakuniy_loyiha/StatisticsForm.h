@@ -4,10 +4,11 @@
 namespace Yakuniyloyiha {
 
 	using namespace System;
+	using namespace System::Net;
 	using namespace System::Windows::Forms;
 	using namespace System::Drawing;
 	using namespace System::Drawing::Drawing2D;
-	using namespace System::IO;
+	using namespace System::Text::RegularExpressions;
 
 	public ref class StatisticsForm : public System::Windows::Forms::Form
 	{
@@ -64,10 +65,31 @@ namespace Yakuniyloyiha {
 
 			this->Controls->Add(header);
 
-			int books = File::Exists("books.txt") ? File::ReadAllLines("books.txt")->Length : 0;
-			int readers = File::Exists("readers.txt") ? File::ReadAllLines("readers.txt")->Length : 0;
-			int issues = File::Exists("issues.txt") ? File::ReadAllLines("issues.txt")->Length : 0;
-			int libraries = File::Exists("libraries.txt") ? File::ReadAllLines("libraries.txt")->Length : 0;
+			// MyForm / AdminForm bilan bir xil server (ma'lumotlar API da, eski .txt fayllar ishlatilmaydi)
+			String^ serverUrl = L"http://5.189.136.95:81";
+			String^ apiUrl = serverUrl + L"/api/";
+			int books = 0, readers = 0, issues = 0, libraries = 0;
+			WebClient^ wc = gcnew WebClient();
+			wc->Encoding = System::Text::Encoding::UTF8;
+			String^ lastError = nullptr;
+			try { libraries = CountListFromApiJson(wc->DownloadString(apiUrl + L"libraries/")); }
+			catch (Exception^ ex) { lastError = ex->Message; }
+			try { books = CountListFromApiJson(wc->DownloadString(apiUrl + L"books/")); }
+			catch (Exception^ ex) { lastError = ex->Message; }
+			try { readers = CountListFromApiJson(wc->DownloadString(apiUrl + L"readers/")); }
+			catch (Exception^ ex) { lastError = ex->Message; }
+			try { issues = CountListFromApiJson(wc->DownloadString(apiUrl + L"issues/")); }
+			catch (Exception^ ex) { lastError = ex->Message; }
+			if (books == 0 && readers == 0 && issues == 0 && libraries == 0 && lastError != nullptr) {
+				MessageBox::Show(
+					AppSettings::Translate(
+						L"Statistika uchun API dan ma'lumot olinmadi:\n",
+						L"Could not load statistics from API:\n",
+						L"Не удалось загрузить статистику с API:\n") + lastError,
+					AppSettings::Translate(L"Xatolik", L"Error", L"Ошибка"),
+					MessageBoxButtons::OK,
+					MessageBoxIcon::Warning);
+			}
 
 			// === STAT CARDS IN 2x2 GRID ===
 			int cardY = 190;
@@ -123,6 +145,18 @@ namespace Yakuniyloyiha {
 	private:
 		System::Collections::Generic::List<int>^ chartValues;
 		System::Collections::Generic::List<String^>^ chartLabels;
+
+		/// Django REST "count" + sahifalash; aks holda ExtractJsonObjects (to'g'ridan-to'g'ri massiv)
+		static int CountListFromApiJson(String^ json) {
+			if (String::IsNullOrEmpty(json)) return 0;
+			Match^ m = Regex::Match(json, L"\"count\"\\s*:\\s*(\\d+)", RegexOptions::IgnoreCase);
+			if (m->Success) {
+				int n = 0;
+				if (Int32::TryParse(m->Groups[1]->Value, n) && n >= 0)
+					return n;
+			}
+			return AppSettings::ExtractJsonObjects(json)->Count;
+		}
 
 		System::Void pnlChart_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
 			Graphics^ g = e->Graphics;

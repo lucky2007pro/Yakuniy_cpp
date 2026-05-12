@@ -317,10 +317,15 @@ namespace Yakuniyloyiha {
 			this->tabPageLibraries = (gcnew System::Windows::Forms::TabPage());
 			this->tabPageSections = (gcnew System::Windows::Forms::TabPage());
 			this->tabPageReaders = (gcnew System::Windows::Forms::TabPage());
+			this->tabPageUsers = (gcnew System::Windows::Forms::TabPage());
 			this->tabPageIssues = (gcnew System::Windows::Forms::TabPage());
 			this->tabPageInsights = (gcnew System::Windows::Forms::TabPage());
 
-			// Readers & Issues Init
+			// Readers, Users & Issues Init
+			this->dgvUsers = (gcnew System::Windows::Forms::DataGridView());
+			this->btnToggleUserActive = (gcnew System::Windows::Forms::Button());
+			this->btnDeleteUser = (gcnew System::Windows::Forms::Button());
+
 			this->dgvReaders = (gcnew System::Windows::Forms::DataGridView());
 			this->txtReaderName = (gcnew System::Windows::Forms::TextBox());
 			this->txtReaderPhone = (gcnew System::Windows::Forms::TextBox());
@@ -398,6 +403,7 @@ namespace Yakuniyloyiha {
 			this->tabPageLibraries->SuspendLayout();
 			this->tabPageSections->SuspendLayout();
 			this->tabPageReaders->SuspendLayout();
+			this->tabPageUsers->SuspendLayout();
 			this->tabPageIssues->SuspendLayout();
          this->tabPageInsights->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvBooks))->BeginInit();
@@ -408,13 +414,7 @@ namespace Yakuniyloyiha {
           (cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvDemand))->BeginInit();
 			this->SuspendLayout();
 
-			// tabControl1
-			this->tabControl1->Controls->Add(this->tabPageBooks);
-			this->tabControl1->Controls->Add(this->tabPageLibraries);
-			this->tabControl1->Controls->Add(this->tabPageSections);
-			this->tabControl1->Controls->Add(this->tabPageReaders);
-			this->tabControl1->Controls->Add(this->tabPageIssues);
-          this->tabControl1->Controls->Add(this->tabPageInsights);
+			// tabControl1 — TabPage larni faqat bir marta qo'shing (takrori menyular va bo'sh kontentga olib keladi)
 			this->tabControl1->Dock = System::Windows::Forms::DockStyle::Fill;
 			this->tabControl1->Location = System::Drawing::Point(0, 0);
 			this->tabControl1->Name = L"tabControl1";
@@ -839,9 +839,14 @@ namespace Yakuniyloyiha {
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(800, 500);
+			this->Controls->Add(this->tabControl1);
+			this->tabControl1->Controls->Add(this->tabPageBooks);
+			this->tabControl1->Controls->Add(this->tabPageLibraries);
+			this->tabControl1->Controls->Add(this->tabPageSections);
 			this->tabControl1->Controls->Add(this->tabPageReaders);
 			this->tabControl1->Controls->Add(this->tabPageUsers);
 			this->tabControl1->Controls->Add(this->tabPageIssues);
+			this->tabControl1->Controls->Add(this->tabPageInsights);
 			this->tabControl1->ResumeLayout(false);
 			this->tabPageBooks->ResumeLayout(false);
 			this->tabPageBooks->PerformLayout();
@@ -855,12 +860,9 @@ namespace Yakuniyloyiha {
 			this->tabPageUsers->PerformLayout();
 			this->tabPageIssues->ResumeLayout(false);
 			this->tabPageIssues->PerformLayout();
+			this->tabPageInsights->ResumeLayout(false);
+			this->tabPageInsights->PerformLayout();
 			// tabPageUsers
-			this->tabPageUsers = (gcnew System::Windows::Forms::TabPage());
-			this->dgvUsers = (gcnew System::Windows::Forms::DataGridView());
-			this->btnToggleUserActive = (gcnew System::Windows::Forms::Button());
-			this->btnDeleteUser = (gcnew System::Windows::Forms::Button());
-
 			this->tabPageUsers->Controls->Add(this->dgvUsers);
 			this->tabPageUsers->Controls->Add(this->btnToggleUserActive);
 			this->tabPageUsers->Controls->Add(this->btnDeleteUser);
@@ -893,8 +895,6 @@ namespace Yakuniyloyiha {
 			this->btnDeleteUser->Text = L"O'chirish";
 			this->btnDeleteUser->Click += gcnew System::EventHandler(this, &AdminForm::btnDeleteUser_Click);
 
-			// tabPageInsights
-			this->tabPageInsights->Controls->Add(this->dgvDemand);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvBooks))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvLibraries))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvSections))->EndInit();
@@ -1361,9 +1361,8 @@ namespace Yakuniyloyiha {
 			// Load Libraries
 			libIds->Clear();
 			String^ libJson = client->DownloadString(apiUrl + "libraries/");
-			MatchCollection^ libMatches = Regex::Matches(libJson, "\\{[^{}]+\\}");
-			for each(Match^ m in libMatches) {
-				String^ obj = m->Value;
+			System::Collections::Generic::List<String^>^ libMatches = AppSettings::ExtractJsonObjects(libJson);
+			for each(String^ obj in libMatches) {
 				int id = Int32::Parse(Regex::Match(obj, "\"id\":(\\d+)")->Groups[1]->Value);
 				String^ name = Regex::Match(obj, "\"name\":\"([^\"]+)\"")->Groups[1]->Value;
 				String^ lat = Regex::Match(obj, "\"latitude\":([\\d\\.]+)")->Groups[1]->Value;
@@ -1376,9 +1375,8 @@ namespace Yakuniyloyiha {
 			// Load Sections
 			secIds->Clear();
 			String^ secJson = client->DownloadString(apiUrl + "sections/");
-			MatchCollection^ secMatches = Regex::Matches(secJson, "\\{[^{}]+\\}");
-			for each(Match^ m in secMatches) {
-				String^ obj = m->Value;
+			System::Collections::Generic::List<String^>^ secMatches = AppSettings::ExtractJsonObjects(secJson);
+			for each(String^ obj in secMatches) {
 				int id = Int32::Parse(Regex::Match(obj, "\"id\":(\\d+)")->Groups[1]->Value);
 				String^ name = Regex::Match(obj, "\"name\":\"([^\"]+)\"")->Groups[1]->Value;
 				dgvSections->Rows->Add(name);
@@ -1389,9 +1387,8 @@ namespace Yakuniyloyiha {
 			// Load Books
 			bookIds->Clear();
 			String^ bookJson = client->DownloadString(apiUrl + "books/");
-			MatchCollection^ bookMatches = Regex::Matches(bookJson, "\\{[^{}]+\\}");
-			for each(Match^ m in bookMatches) {
-				String^ obj = m->Value;
+			System::Collections::Generic::List<String^>^ bookMatches = AppSettings::ExtractJsonObjects(bookJson);
+			for each(String^ obj in bookMatches) {
 				int id = Int32::Parse(Regex::Match(obj, "\"id\":(\\d+)")->Groups[1]->Value);
 				String^ title = Regex::Match(obj, "\"title\":\"([^\"]+)\"")->Groups[1]->Value;
 				String^ libName = Regex::Match(obj, "\"library_name\":\"([^\"]+)\"")->Groups[1]->Value;
@@ -1412,9 +1409,8 @@ namespace Yakuniyloyiha {
 			// Load Library Cards from API
 			readerIds->Clear();
 			String^ readJson = client->DownloadString(apiUrl + "library-cards-admin/");
-			MatchCollection^ readMatches = Regex::Matches(readJson, "\\{[^{}]+\\}");
-			for each(Match^ m in readMatches) {
-				String^ obj = m->Value;
+			System::Collections::Generic::List<String^>^ readMatches = AppSettings::ExtractJsonObjects(readJson);
+			for each(String^ obj in readMatches) {
 				int id = Int32::Parse(Regex::Match(obj, "\"id\":(\\d+)")->Groups[1]->Value);
 				int readerId = Int32::Parse(Regex::Match(obj, "\"reader_id\":(\\d+)")->Groups[1]->Value);
 				String^ fullname = Regex::Match(obj, "\"reader_name\":\"([^\"]+)\"")->Groups[1]->Value;
@@ -1434,9 +1430,8 @@ namespace Yakuniyloyiha {
 
 			// Load Users
 			String^ usersJson = client->DownloadString(apiUrl + "readers/");
-			MatchCollection^ userMatches = Regex::Matches(usersJson, "\\{[^{}]+\\}");
-			for each(Match^ m in userMatches) {
-				String^ obj = m->Value;
+			System::Collections::Generic::List<String^>^ userMatches = AppSettings::ExtractJsonObjects(usersJson);
+			for each(String^ obj in userMatches) {
 				int id = Int32::Parse(Regex::Match(obj, "\"id\":(\\d+)")->Groups[1]->Value);
 				String^ fullname = Regex::Match(obj, "\"fullname\":\"([^\"]+)\"")->Groups[1]->Value;
 				String^ phone = Regex::Match(obj, "\"phone\":\"([^\"]+)\"")->Groups[1]->Value;
@@ -1452,9 +1447,8 @@ namespace Yakuniyloyiha {
 
 			// Load Issues from API
 			String^ issueJson = client->DownloadString(apiUrl + "issues/");
-			MatchCollection^ issueMatches = Regex::Matches(issueJson, "\\{[^{}]+\\}");
-			for each(Match^ m in issueMatches) {
-				String^ obj = m->Value;
+			System::Collections::Generic::List<String^>^ issueMatches = AppSettings::ExtractJsonObjects(issueJson);
+			for each(String^ obj in issueMatches) {
 				int id = Int32::Parse(Regex::Match(obj, "\"id\":(\\d+)")->Groups[1]->Value);
 				String^ readerName = Regex::Match(obj, "\"reader_name\":\"([^\"]+)\"")->Groups[1]->Value;
 				String^ bookTitle = Regex::Match(obj, "\"book_title\":\"([^\"]+)\"")->Groups[1]->Value;
