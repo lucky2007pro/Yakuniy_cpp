@@ -59,4 +59,7 @@
   <ItemGroup>
     <Manifest Include="app.manifest" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="DESIGN_GUIDE.md" />
+  </ItemGroup>
 </Project>

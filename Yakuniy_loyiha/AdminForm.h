@@ -19,12 +19,31 @@ namespace Yakuniyloyiha {
 		// Nerverd serverga o'tishda shu yerni o'zgartiring
 		String^ serverUrl = L"http://5.189.136.95:81"; 
 		String^ apiUrl = serverUrl + L"/api/";
+		// Admin uchun server token - Django settings.py dagi ADMIN_API_TOKEN bilan mos kelishi shart
+		String^ adminApiToken = L"TATU2026";
+
+	private: WebClient^ MakeAdminClient() {
+		WebClient^ client = gcnew WebClient();
+		client->Encoding = System::Text::Encoding::UTF8;
+		client->Headers[HttpRequestHeader::ContentType] = "application/json";
+		client->Headers->Add(L"X-Admin-Token", adminApiToken);
+		return client;
+	}
 
 	private: System::Collections::Generic::Dictionary<String^, int>^ libIds = gcnew System::Collections::Generic::Dictionary<String^, int>();
 	private: System::Collections::Generic::Dictionary<String^, int>^ secIds = gcnew System::Collections::Generic::Dictionary<String^, int>();
 	private: System::Collections::Generic::Dictionary<String^, int>^ readerIds = gcnew System::Collections::Generic::Dictionary<String^, int>();
 	private: System::Collections::Generic::Dictionary<int, int>^ issueRowToId = gcnew System::Collections::Generic::Dictionary<int, int>(); // rowIndex -> issueId
 	private: System::Collections::Generic::Dictionary<String^, int>^ bookIds = gcnew System::Collections::Generic::Dictionary<String^, int>(); // bookTitle -> bookId
+	private: Panel^ pnlHeroHeader;
+	private: Panel^ pnlHeroIcon;
+	private: Label^ lblHeroIcon;
+	private: Label^ lblHeroTitle;
+	private: Label^ lblHeroSubtitle;
+	private: Panel^ pnlHeroBadgeModules;
+	private: Panel^ pnlHeroBadgeApi;
+	private: Label^ lblHeroBadgeModules;
+	private: Label^ lblHeroBadgeApi;
 	public:
 		AdminForm(void)
 		{
@@ -50,7 +69,8 @@ namespace Yakuniyloyiha {
 	private: System::Windows::Forms::TabPage^ tabPageBooks;
 	private: System::Windows::Forms::TabPage^ tabPageLibraries;
 	private: System::Windows::Forms::TabPage^ tabPageSections;
-	private: System::Windows::Forms::TabPage^ tabPageReaders;
+	private: System::Windows::Forms::TabPage^ tabPageReaders; // Kartalar uchun
+	private: System::Windows::Forms::TabPage^ tabPageUsers; // Foydalanuvchilar (Readers) uchun
 	private: System::Windows::Forms::TabPage^ tabPageIssues;
 	private: System::Windows::Forms::TabPage^ tabPageInsights;
 
@@ -107,6 +127,11 @@ namespace Yakuniyloyiha {
 	private: System::Windows::Forms::Label^ lblReadersPageTitle;
 	private: System::Windows::Forms::Label^ lblReadersPageHint;
 
+	// Users Tab Controls
+	private: System::Windows::Forms::DataGridView^ dgvUsers;
+	private: System::Windows::Forms::Button^ btnToggleUserActive;
+	private: System::Windows::Forms::Button^ btnDeleteUser;
+
 	// Issues Tab Controls
 	private: System::Windows::Forms::DataGridView^ dgvIssues;
 	private: System::Windows::Forms::ComboBox^ cmbIssueReader;
@@ -137,6 +162,152 @@ namespace Yakuniyloyiha {
 
 	private:
 		System::ComponentModel::Container^ components;
+
+	private: void EnsureAdminHeader() {
+		if (pnlHeroHeader != nullptr) return;
+
+		pnlHeroHeader = gcnew Panel();
+		pnlHeroHeader->Name = L"pnlHeroHeader";
+		pnlHeroHeader->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left | AnchorStyles::Right);
+		this->Controls->Add(pnlHeroHeader);
+
+		pnlHeroIcon = gcnew Panel();
+		pnlHeroIcon->BackColor = Color::FromArgb(235, 255, 255, 255);
+		pnlHeroHeader->Controls->Add(pnlHeroIcon);
+
+		lblHeroIcon = gcnew Label();
+		lblHeroIcon->Text = L"🛡";
+		lblHeroIcon->Dock = DockStyle::Fill;
+		lblHeroIcon->TextAlign = ContentAlignment::MiddleCenter;
+		lblHeroIcon->Font = gcnew Drawing::Font(L"Segoe UI", 28.0F);
+		lblHeroIcon->BackColor = Color::Transparent;
+		pnlHeroIcon->Controls->Add(lblHeroIcon);
+
+		lblHeroTitle = gcnew Label();
+		lblHeroTitle->Text = L"Admin Panel";
+		lblHeroTitle->AutoEllipsis = true;
+		pnlHeroHeader->Controls->Add(lblHeroTitle);
+
+		lblHeroSubtitle = gcnew Label();
+		lblHeroSubtitle->Text = L"Kutubxona modullarini bir joydan boshqaring";
+		lblHeroSubtitle->AutoEllipsis = true;
+		pnlHeroHeader->Controls->Add(lblHeroSubtitle);
+
+		pnlHeroBadgeModules = gcnew Panel();
+		pnlHeroBadgeModules->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
+		pnlHeroHeader->Controls->Add(pnlHeroBadgeModules);
+
+		lblHeroBadgeModules = gcnew Label();
+		lblHeroBadgeModules->Dock = DockStyle::Fill;
+		lblHeroBadgeModules->Text = L"6 modul";
+		lblHeroBadgeModules->TextAlign = ContentAlignment::MiddleCenter;
+		lblHeroBadgeModules->BackColor = Color::Transparent;
+		pnlHeroBadgeModules->Controls->Add(lblHeroBadgeModules);
+
+		pnlHeroBadgeApi = gcnew Panel();
+		pnlHeroBadgeApi->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
+		pnlHeroHeader->Controls->Add(pnlHeroBadgeApi);
+
+		lblHeroBadgeApi = gcnew Label();
+		lblHeroBadgeApi->Dock = DockStyle::Fill;
+		lblHeroBadgeApi->Text = L"API online";
+		lblHeroBadgeApi->TextAlign = ContentAlignment::MiddleCenter;
+		lblHeroBadgeApi->BackColor = Color::Transparent;
+		pnlHeroBadgeApi->Controls->Add(lblHeroBadgeApi);
+	}
+
+	private: void UpdateAdminHeaderLayout() {
+		if (pnlHeroHeader == nullptr) return;
+
+		pnlHeroHeader->Location = Point(16, 12);
+		pnlHeroHeader->Size = System::Drawing::Size(this->ClientSize.Width - 32, 96);
+		AppSettings::EnableGradientBackground(pnlHeroHeader, AppSettings::GradientPrimaryStart(), AppSettings::GradientPrimaryEnd());
+		AppSettings::MakeRounded(pnlHeroHeader, 18);
+
+		pnlHeroIcon->Location = Point(18, 16);
+		pnlHeroIcon->Size = System::Drawing::Size(64, 64);
+		AppSettings::MakeRounded(pnlHeroIcon, 32);
+		lblHeroIcon->ForeColor = AppSettings::TextColor();
+
+		lblHeroTitle->Location = Point(96, 18);
+		lblHeroTitle->Size = System::Drawing::Size(280, 30);
+		lblHeroTitle->Font = gcnew Drawing::Font(L"Segoe UI Semibold", 16.0F, FontStyle::Bold);
+		lblHeroTitle->ForeColor = Color::White;
+		lblHeroTitle->BackColor = Color::Transparent;
+
+		lblHeroSubtitle->Location = Point(98, 50);
+		lblHeroSubtitle->Size = System::Drawing::Size(360, 22);
+		lblHeroSubtitle->Font = gcnew Drawing::Font(L"Segoe UI", 9.5F, FontStyle::Regular);
+		lblHeroSubtitle->ForeColor = Color::FromArgb(232, 243, 255);
+		lblHeroSubtitle->BackColor = Color::Transparent;
+
+		pnlHeroBadgeModules->Location = Point(pnlHeroHeader->Width - 234, 20);
+		pnlHeroBadgeModules->Size = System::Drawing::Size(96, 30);
+		pnlHeroBadgeModules->BackColor = Color::FromArgb(235, 255, 255, 255);
+		AppSettings::MakeRounded(pnlHeroBadgeModules, 15);
+		lblHeroBadgeModules->Font = gcnew Drawing::Font(L"Segoe UI Semibold", 8.8F, FontStyle::Bold);
+		lblHeroBadgeModules->ForeColor = AppSettings::PrimaryColor();
+
+		pnlHeroBadgeApi->Location = Point(pnlHeroHeader->Width - 126, 20);
+		pnlHeroBadgeApi->Size = System::Drawing::Size(108, 30);
+		pnlHeroBadgeApi->BackColor = Color::FromArgb(235, 255, 255, 255);
+		AppSettings::MakeRounded(pnlHeroBadgeApi, 15);
+		lblHeroBadgeApi->Font = gcnew Drawing::Font(L"Segoe UI Semibold", 8.8F, FontStyle::Bold);
+		lblHeroBadgeApi->ForeColor = AppSettings::SuccessColor();
+
+		tabControl1->Dock = DockStyle::None;
+		tabControl1->Location = Point(16, 120);
+		tabControl1->Size = System::Drawing::Size(this->ClientSize.Width - 32, this->ClientSize.Height - 136);
+		tabControl1->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Bottom | AnchorStyles::Left | AnchorStyles::Right);
+	}
+
+	private: System::Drawing::Drawing2D::GraphicsPath^ CreateRoundedPath(Rectangle rect, int radius) {
+		System::Drawing::Drawing2D::GraphicsPath^ path = gcnew System::Drawing::Drawing2D::GraphicsPath();
+		int diameter = radius * 2;
+		path->AddArc(rect.X, rect.Y, diameter, diameter, 180, 90);
+		path->AddArc(rect.Right - diameter, rect.Y, diameter, diameter, 270, 90);
+		path->AddArc(rect.Right - diameter, rect.Bottom - diameter, diameter, diameter, 0, 90);
+		path->AddArc(rect.X, rect.Bottom - diameter, diameter, diameter, 90, 90);
+		path->CloseFigure();
+		return path;
+	}
+
+	private: System::Void DrawAdminTab(System::Object^ sender, System::Windows::Forms::DrawItemEventArgs^ e) {
+		if (e->Index < 0 || tabControl1 == nullptr || e->Index >= tabControl1->TabPages->Count) return;
+
+		e->Graphics->SmoothingMode = System::Drawing::Drawing2D::SmoothingMode::AntiAlias;
+
+		bool isSelected = (e->State & DrawItemState::Selected) == DrawItemState::Selected;
+		Rectangle tabRect = e->Bounds;
+		tabRect.Inflate(-4, -3);
+
+		Color fillColor = isSelected ? AppSettings::PrimaryColor() : AppSettings::SurfaceColor();
+		Color borderColor = isSelected ? AppSettings::PrimaryHoverColor() : AppSettings::BorderColor();
+		Color textColor = isSelected ? Color::White : AppSettings::TextColor();
+
+		System::Drawing::Drawing2D::GraphicsPath^ path = CreateRoundedPath(tabRect, 8);
+		SolidBrush^ fillBrush = gcnew SolidBrush(fillColor);
+		Pen^ borderPen = gcnew Pen(borderColor, 1.2f);
+
+		e->Graphics->FillPath(fillBrush, path);
+		e->Graphics->DrawPath(borderPen, path);
+
+		String^ text = tabControl1->TabPages[e->Index]->Text;
+		Rectangle textRect = tabRect;
+		textRect.Inflate(-6, -2);
+		TextRenderer::DrawText(
+			e->Graphics,
+			text,
+			tabControl1->Font,
+			textRect,
+			textColor,
+			TextFormatFlags::HorizontalCenter | TextFormatFlags::VerticalCenter | TextFormatFlags::EndEllipsis
+		);
+
+		delete fillBrush;
+		delete borderPen;
+		delete path;
+	}
 
 #pragma region Windows Form Designer generated code
 		void InitializeComponent(void)
@@ -273,7 +444,7 @@ namespace Yakuniyloyiha {
 			this->tabPageBooks->Name = L"tabPageBooks";
 			this->tabPageBooks->Padding = System::Windows::Forms::Padding(3);
 			this->tabPageBooks->Size = System::Drawing::Size(792, 471);
-			this->tabPageBooks->Text = L"Kitoblar";
+			this->tabPageBooks->Text = L"📚 Kitoblar";
 			this->tabPageBooks->UseVisualStyleBackColor = true;
 
 			// Books Controls Setup
@@ -373,7 +544,7 @@ namespace Yakuniyloyiha {
 			this->tabPageLibraries->Name = L"tabPageLibraries";
 			this->tabPageLibraries->Padding = System::Windows::Forms::Padding(3);
 			this->tabPageLibraries->Size = System::Drawing::Size(792, 471);
-			this->tabPageLibraries->Text = L"Kutubxonalar";
+			this->tabPageLibraries->Text = L"🏛 Kutubxonalar";
 			this->tabPageLibraries->UseVisualStyleBackColor = true;
 
 			this->dgvLibraries->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
@@ -426,7 +597,7 @@ namespace Yakuniyloyiha {
 			this->tabPageSections->Name = L"tabPageSections";
 			this->tabPageSections->Padding = System::Windows::Forms::Padding(3);
 			this->tabPageSections->Size = System::Drawing::Size(792, 471);
-			this->tabPageSections->Text = L"Bo'limlar";
+			this->tabPageSections->Text = L"🗂 Bo'limlar";
 			this->tabPageSections->UseVisualStyleBackColor = true;
 
 			this->dgvSections->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
@@ -469,7 +640,7 @@ namespace Yakuniyloyiha {
 			this->tabPageReaders->Name = L"tabPageReaders";
 			this->tabPageReaders->Padding = System::Windows::Forms::Padding(3);
 			this->tabPageReaders->Size = System::Drawing::Size(792, 471);
-			this->tabPageReaders->Text = L"Kitobxonlar";
+			this->tabPageReaders->Text = L"👥 Kartalar";
 			this->tabPageReaders->UseVisualStyleBackColor = true;
 
 			this->dgvReaders->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
@@ -479,7 +650,7 @@ namespace Yakuniyloyiha {
 			this->dgvReaders->ColumnCount = 6;
 			this->dgvReaders->Columns[0]->Name = L"F.I.Sh";
 			this->dgvReaders->Columns[1]->Name = L"Telefon";
-			this->dgvReaders->Columns[2]->Name = L"ID Karta";
+			this->dgvReaders->Columns[2]->Name = L"Kutubxona";
 			this->dgvReaders->Columns[3]->Name = L"Status";
 			this->dgvReaders->Columns[4]->Name = L"ID";
 			this->dgvReaders->Columns[4]->Visible = false;
@@ -497,14 +668,15 @@ namespace Yakuniyloyiha {
 			this->txtReaderID->Location = System::Drawing::Point(10, 120);
 			this->txtReaderID->Size = System::Drawing::Size(200, 22);
 			this->txtReaderID->Text = L"";
+            this->txtReaderID->Visible = false; // Kerak emas
 
 			this->btnAddReader->Location = System::Drawing::Point(10, 160);
 			this->btnAddReader->Size = System::Drawing::Size(90, 30);
 			this->btnAddReader->Text = L"Qo'shish";
-			this->btnAddReader->Click += gcnew System::EventHandler(this, &AdminForm::btnAddReader_Click);
+			this->btnAddReader->Visible = false; // Kartalarni dasturdan qo'shib bo'lmaydi
 
-			this->btnDeleteReader->Location = System::Drawing::Point(120, 160);
-			this->btnDeleteReader->Size = System::Drawing::Size(90, 30);
+			this->btnDeleteReader->Location = System::Drawing::Point(10, 160);
+			this->btnDeleteReader->Size = System::Drawing::Size(200, 30);
 			this->btnDeleteReader->Text = L"O'chirish";
 			this->btnDeleteReader->Click += gcnew System::EventHandler(this, &AdminForm::btnDeleteReader_Click);
 
@@ -525,11 +697,11 @@ namespace Yakuniyloyiha {
 
 			this->lblReadersPageTitle->AutoSize = true;
 			this->lblReadersPageTitle->Location = System::Drawing::Point(10, 16);
-			this->lblReadersPageTitle->Text = L"Kitobxonlar boshqaruvi";
+			this->lblReadersPageTitle->Text = L"Kartalar boshqaruvi";
 
 			this->lblReadersPageHint->AutoSize = true;
 			this->lblReadersPageHint->Location = System::Drawing::Point(10, 284);
-			this->lblReadersPageHint->Text = L"Avval jadvaldan kitobxon tanlang, keyin tasdiqlang yoki bloklang.";
+			this->lblReadersPageHint->Text = L"Avval jadvaldan karta so'rovini tanlang, keyin tasdiqlang yoki bloklang.";
 
 			// tabPageIssues
 			this->tabPageIssues->Controls->Add(this->dgvIssues);
@@ -542,7 +714,7 @@ namespace Yakuniyloyiha {
 			this->tabPageIssues->Name = L"tabPageIssues";
 			this->tabPageIssues->Padding = System::Windows::Forms::Padding(3);
 			this->tabPageIssues->Size = System::Drawing::Size(792, 471);
-			this->tabPageIssues->Text = L"Qarzlar (Ijaralar)";
+			this->tabPageIssues->Text = L"📄 Qarzlar";
 			this->tabPageIssues->UseVisualStyleBackColor = true;
 
 			this->dgvIssues->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
@@ -586,7 +758,7 @@ namespace Yakuniyloyiha {
 			this->tabPageInsights->Name = L"tabPageInsights";
 			this->tabPageInsights->Padding = System::Windows::Forms::Padding(3);
 			this->tabPageInsights->Size = System::Drawing::Size(792, 471);
-			this->tabPageInsights->Text = L"Smart Dashboard";
+			this->tabPageInsights->Text = L"📊 Dashboard";
 			this->tabPageInsights->UseVisualStyleBackColor = true;
 
 			// Card 1: Jami ijaralar
@@ -667,9 +839,9 @@ namespace Yakuniyloyiha {
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(800, 500);
-			this->Controls->Add(this->tabControl1);
-			this->Name = L"AdminForm";
-			this->Text = L"Admin Panel";
+			this->tabControl1->Controls->Add(this->tabPageReaders);
+			this->tabControl1->Controls->Add(this->tabPageUsers);
+			this->tabControl1->Controls->Add(this->tabPageIssues);
 			this->tabControl1->ResumeLayout(false);
 			this->tabPageBooks->ResumeLayout(false);
 			this->tabPageBooks->PerformLayout();
@@ -679,14 +851,55 @@ namespace Yakuniyloyiha {
 			this->tabPageSections->PerformLayout();
 			this->tabPageReaders->ResumeLayout(false);
 			this->tabPageReaders->PerformLayout();
+			this->tabPageUsers->ResumeLayout(false);
+			this->tabPageUsers->PerformLayout();
 			this->tabPageIssues->ResumeLayout(false);
 			this->tabPageIssues->PerformLayout();
-           this->tabPageInsights->ResumeLayout(false);
-			this->tabPageInsights->PerformLayout();
+			// tabPageUsers
+			this->tabPageUsers = (gcnew System::Windows::Forms::TabPage());
+			this->dgvUsers = (gcnew System::Windows::Forms::DataGridView());
+			this->btnToggleUserActive = (gcnew System::Windows::Forms::Button());
+			this->btnDeleteUser = (gcnew System::Windows::Forms::Button());
+
+			this->tabPageUsers->Controls->Add(this->dgvUsers);
+			this->tabPageUsers->Controls->Add(this->btnToggleUserActive);
+			this->tabPageUsers->Controls->Add(this->btnDeleteUser);
+			this->tabPageUsers->Location = System::Drawing::Point(4, 25);
+			this->tabPageUsers->Name = L"tabPageUsers";
+			this->tabPageUsers->Padding = System::Windows::Forms::Padding(3);
+			this->tabPageUsers->Size = System::Drawing::Size(792, 471);
+			this->tabPageUsers->Text = L"🙎‍♂️ Foydalanuvchilar";
+			this->tabPageUsers->UseVisualStyleBackColor = true;
+
+			this->dgvUsers->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
+			this->dgvUsers->Location = System::Drawing::Point(20, 20);
+			this->dgvUsers->Name = L"dgvUsers";
+			this->dgvUsers->Size = System::Drawing::Size(750, 380);
+			this->dgvUsers->ColumnCount = 6;
+			this->dgvUsers->Columns[0]->Name = L"ID";
+			this->dgvUsers->Columns[1]->Name = L"F.I.Sh";
+			this->dgvUsers->Columns[2]->Name = L"Telefon";
+			this->dgvUsers->Columns[3]->Name = L"Karta ID";
+			this->dgvUsers->Columns[4]->Name = L"Holati";
+			this->dgvUsers->Columns[5]->Name = L"Ro'yxatdan o'tgan";
+
+			this->btnToggleUserActive->Location = System::Drawing::Point(20, 420);
+			this->btnToggleUserActive->Size = System::Drawing::Size(180, 30);
+			this->btnToggleUserActive->Text = L"Faollashtirish/Bloklash";
+			this->btnToggleUserActive->Click += gcnew System::EventHandler(this, &AdminForm::btnToggleUserActive_Click);
+
+			this->btnDeleteUser->Location = System::Drawing::Point(220, 420);
+			this->btnDeleteUser->Size = System::Drawing::Size(120, 30);
+			this->btnDeleteUser->Text = L"O'chirish";
+			this->btnDeleteUser->Click += gcnew System::EventHandler(this, &AdminForm::btnDeleteUser_Click);
+
+			// tabPageInsights
+			this->tabPageInsights->Controls->Add(this->dgvDemand);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvBooks))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvLibraries))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvSections))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvReaders))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvUsers))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvIssues))->EndInit();
           (cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvDemand))->EndInit();
 			this->ResumeLayout(false);
@@ -698,31 +911,38 @@ namespace Yakuniyloyiha {
 
 	private: System::Void ApplyModernStyle() {
 		Color pageBg = AppSettings::PageBackColor();
-		Color surface = AppSettings::SurfaceColor();
-		Color elevated = AppSettings::ElevatedColor();
 		Color text = AppSettings::TextColor();
-		Color muted = AppSettings::MutedTextColor();
 		Color primary = AppSettings::PrimaryColor();
 		this->BackColor = pageBg;
 		this->ForeColor = text;
 		this->Font = (gcnew System::Drawing::Font(L"Segoe UI", 10.0F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
+		EnsureAdminHeader();
+		UpdateAdminHeaderLayout();
 
 		// TabControl dizayni
-		tabControl1->ItemSize = System::Drawing::Size(130, 40);
+		tabControl1->ItemSize = System::Drawing::Size(128, 38);
 		tabControl1->SizeMode = System::Windows::Forms::TabSizeMode::Fixed;
-		tabControl1->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 9.5F, System::Drawing::FontStyle::Bold);
+		tabControl1->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 8.6F, System::Drawing::FontStyle::Bold);
+		tabControl1->Appearance = TabAppearance::Normal;
+		tabControl1->DrawMode = TabDrawMode::OwnerDrawFixed;
+		tabControl1->Padding = Point(12, 6);
+		tabControl1->DrawItem -= gcnew DrawItemEventHandler(this, &AdminForm::DrawAdminTab);
+		tabControl1->DrawItem += gcnew DrawItemEventHandler(this, &AdminForm::DrawAdminTab);
 		tabPageBooks->BackColor = pageBg;
 		tabPageLibraries->BackColor = pageBg;
 		tabPageSections->BackColor = pageBg;
 		tabPageReaders->BackColor = pageBg;
+		tabPageUsers->BackColor = pageBg;
 		tabPageIssues->BackColor = pageBg;
 		tabPageInsights->BackColor = pageBg;
 
 		// Tugmalar (Buttons)
-     array<Button^>^ buttons = { btnAddBook, btnEditBook, btnAddLibrary, btnAddSection, btnDeleteBook, btnDeleteLibrary, btnDeleteSection, btnSelectImage, btnSelectEbook, btnAddReader, btnDeleteReader, btnApproveReader, btnRejectReader, btnIssueBook, btnReturnBook };
+     array<Button^>^ buttons = { btnAddBook, btnEditBook, btnAddLibrary, btnAddSection, btnDeleteBook, btnDeleteLibrary, btnDeleteSection, btnSelectImage, btnSelectEbook, btnAddReader, btnDeleteReader, btnApproveReader, btnRejectReader, btnToggleUserActive, btnDeleteUser, btnIssueBook, btnReturnBook };
 		for each (Button^ btn in buttons) {
-			AppSettings::StyleButton(btn, primary, System::Drawing::Color::White);
-			btn->Height = 35;
+			AppSettings::StyleModernButton(btn, true);
+			btn->Height = 34;
+			btn->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 9.2F, System::Drawing::FontStyle::Bold);
+			btn->TextAlign = ContentAlignment::MiddleCenter;
 		}
 
 		// Qo'shish va O'chirish ranglari
@@ -738,22 +958,37 @@ namespace Yakuniyloyiha {
 		btnDeleteLibrary->BackColor = AppSettings::DangerColor();
 		btnDeleteSection->BackColor = AppSettings::DangerColor();
 		btnDeleteReader->BackColor = AppSettings::DangerColor();
+		btnDeleteUser->BackColor = AppSettings::DangerColor();
+		btnToggleUserActive->BackColor = AppSettings::WarningColor();
 		btnApproveReader->BackColor = AppSettings::SuccessColor();
 		btnRejectReader->BackColor = AppSettings::DangerColor();
 		btnReturnBook->BackColor = AppSettings::WarningColor();
 
 		if (lblReadersPageTitle != nullptr) {
-			lblReadersPageTitle->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 12.0F, System::Drawing::FontStyle::Bold);
-			lblReadersPageTitle->ForeColor = text;
+			AppSettings::StyleSectionTitle(lblReadersPageTitle);
 		}
 		if (lblReadersPageHint != nullptr) {
-			lblReadersPageHint->ForeColor = muted;
+			AppSettings::StyleBodyText(lblReadersPageHint);
+		}
+
+		if (lblImagePath != nullptr) {
+			AppSettings::StyleBodyText(lblImagePath);
+			lblImagePath->AutoEllipsis = true;
+		}
+		if (lblEbookPath != nullptr) {
+			AppSettings::StyleBodyText(lblEbookPath);
+			lblEbookPath->AutoEllipsis = true;
 		}
 
 		btnSelectImage->BackColor = primary;
 		btnSelectEbook->BackColor = System::Drawing::Color::FromArgb(124, 58, 237);
 
-		// 3D style dashboard cards
+		// Dashboard cards
+		AppSettings::StyleSurfacePanel(pnlCardTotal, 18, false);
+		AppSettings::StyleSurfacePanel(pnlCardTop, 18, false);
+		AppSettings::StyleSurfacePanel(pnlCardReaders, 18, false);
+		AppSettings::StyleSurfacePanel(pnlDonutChart, 18, true);
+
 		pnlCardTotal->Tag = gcnew cli::array<System::Drawing::Color>(2) { System::Drawing::Color::FromArgb(33, 150, 243), System::Drawing::Color::FromArgb(21, 101, 192) };
 		pnlCardTop->Tag = gcnew cli::array<System::Drawing::Color>(2) { System::Drawing::Color::FromArgb(111, 66, 193), System::Drawing::Color::FromArgb(81, 45, 168) };
 		pnlCardReaders->Tag = gcnew cli::array<System::Drawing::Color>(2) { System::Drawing::Color::FromArgb(46, 204, 113), System::Drawing::Color::FromArgb(39, 174, 96) };
@@ -770,6 +1005,14 @@ namespace Yakuniyloyiha {
 		lblTotalValue->BackColor = System::Drawing::Color::Transparent;
 		lblTopTitle->BackColor = System::Drawing::Color::Transparent;
 		lblTopValue->BackColor = System::Drawing::Color::Transparent;
+		lblReadersTitle->BackColor = System::Drawing::Color::Transparent;
+		lblReadersValue->BackColor = System::Drawing::Color::Transparent;
+		lblTotalTitle->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 11.5F, System::Drawing::FontStyle::Bold);
+		lblTopTitle->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 11.5F, System::Drawing::FontStyle::Bold);
+		lblReadersTitle->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 11.5F, System::Drawing::FontStyle::Bold);
+		lblTotalValue->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 28.0F, System::Drawing::FontStyle::Bold);
+		lblTopValue->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 13.0F, System::Drawing::FontStyle::Bold);
+		lblReadersValue->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 28.0F, System::Drawing::FontStyle::Bold);
 
 		// Placeholder tizimi — GotFocus/LostFocus orqali
 		Color placeholderColor = System::Drawing::Color::FromArgb(160, 160, 160);
@@ -795,12 +1038,12 @@ namespace Yakuniyloyiha {
 		array<Control^>^ inputs = { txtBookName, cmbBookLibrary, cmbBookSection, txtBookShelf, txtBookRow, txtLibraryName, txtLibraryLat, txtLibraryLon, txtSectionName, txtReaderName, txtReaderPhone, txtReaderID, cmbIssueReader, cmbIssueBook, dtpReturnDate };
 		for each (Control^ ctrl in inputs) {
 			AppSettings::StyleInput(ctrl);
-			ctrl->Font = (gcnew System::Drawing::Font(L"Segoe UI", 11.0F));
+			ctrl->Font = (gcnew System::Drawing::Font(L"Segoe UI", 10.0F));
 			ctrl->Height = 30;
 		}
 
 		// Jadvallar (DataGridView) dizayni
-        array<DataGridView^>^ dgvs = { dgvBooks, dgvLibraries, dgvSections, dgvReaders, dgvIssues, dgvDemand };
+        array<DataGridView^>^ dgvs = { dgvBooks, dgvLibraries, dgvSections, dgvReaders, dgvUsers, dgvIssues, dgvDemand };
 		for each (DataGridView^ dgv in dgvs) {
 			AppSettings::StyleGrid(dgv);
 		}
@@ -808,12 +1051,13 @@ namespace Yakuniyloyiha {
 		array<Label^>^ labels = { lblBookName, lblBookLibrary, lblBookSection, lblBookShelf, lblBookRow, lblLibraryName, lblLibraryLat, lblLibraryLon, lblSectionName };
 		for each (Label^ lbl in labels) {
 			if (lbl == nullptr) continue;
-			lbl->ForeColor = muted;
+			AppSettings::StyleBodyText(lbl);
 			lbl->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 9.0F, System::Drawing::FontStyle::Bold);
 		}
 
 		UpdateBooksTabLayout();
 		UpdateReadersTabLayout();
+		UpdateUsersTabLayout();
 		UpdateIssuesTabLayout();
 	}
 
@@ -936,14 +1180,31 @@ namespace Yakuniyloyiha {
 	}
 
 	private: System::Void AdminForm_Resize(System::Object^ sender, System::EventArgs^ e) {
+		UpdateAdminHeaderLayout();
 		UpdateBooksTabLayout();
 		UpdateReadersTabLayout();
+		UpdateUsersTabLayout();
 		UpdateIssuesTabLayout();
+	}
+
+	private: System::Void UpdateUsersTabLayout() {
+		if (tabPageUsers == nullptr || dgvUsers == nullptr) return;
+		int tabW = tabPageUsers->ClientSize.Width;
+		int tabH = tabPageUsers->ClientSize.Height;
+		int margin = 14;
+		int btnH = 34;
+
+		dgvUsers->Location = System::Drawing::Point(margin, margin);
+		dgvUsers->Size = System::Drawing::Size(tabW - margin * 2, tabH - margin * 3 - btnH);
+		
+		int btnY = tabH - margin - btnH;
+		if (btnToggleUserActive != nullptr) btnToggleUserActive->Location = System::Drawing::Point(margin, btnY);
+		if (btnDeleteUser != nullptr) btnDeleteUser->Location = System::Drawing::Point(margin + 200, btnY);
 	}
 
 	private: System::Void btnApproveReader_Click(System::Object^ sender, System::EventArgs^ e) {
 		if (dgvReaders->SelectedRows->Count <= 0) {
-			MessageBox::Show(L"Tasdiqlash uchun kitobxonni tanlang!");
+			MessageBox::Show(L"Tasdiqlash uchun kartani tanlang!");
 			return;
 		}
 
@@ -952,12 +1213,16 @@ namespace Yakuniyloyiha {
 			String^ idStr = row->Cells[4]->Value != nullptr ? row->Cells[4]->Value->ToString() : "";
 			if (String::IsNullOrWhiteSpace(idStr)) return;
 
-			WebClient^ client = gcnew WebClient();
-			client->Encoding = System::Text::Encoding::UTF8;
-			client->Headers[HttpRequestHeader::ContentType] = "application/json";
-			client->UploadString(apiUrl + "readers/" + idStr + "/", "PATCH", "{\"is_approved\":true,\"is_active\":true}");
+			WebClient^ client = MakeAdminClient();
+			String^ resp = client->UploadString(apiUrl + "library-cards-admin/" + idStr + "/", "PATCH", "{\"is_approved\":true}");
 
-			row->Cells[3]->Value = L"Tasdiqlangan";
+			String^ approvedText = Regex::Match(resp, "\"is_approved\":\\s*(true|false)", RegexOptions::IgnoreCase)->Groups[1]->Value;
+			if (approvedText->ToLower() == "true") {
+				row->Cells[3]->Value = L"Tasdiqlangan";
+				MessageBox::Show(L"Kutubxona kartasi muvaffaqiyatli tasdiqlandi.", L"Muvaffaqiyat", MessageBoxButtons::OK, MessageBoxIcon::Information);
+			} else {
+				MessageBox::Show(L"Server tasdiqlashni qabul qilmadi.", L"Ogohlantirish", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+			}
 		}
 		catch (Exception^ ex) {
 			MessageBox::Show(L"Tasdiqlashda xatolik: " + ex->Message);
@@ -1008,7 +1273,7 @@ namespace Yakuniyloyiha {
 
 	private: System::Void btnRejectReader_Click(System::Object^ sender, System::EventArgs^ e) {
 		if (dgvReaders->SelectedRows->Count <= 0) {
-			MessageBox::Show(L"Bloklash uchun kitobxonni tanlang!");
+			MessageBox::Show(L"Bloklash uchun kartani tanlang!");
 			return;
 		}
 
@@ -1017,15 +1282,57 @@ namespace Yakuniyloyiha {
 			String^ idStr = row->Cells[4]->Value != nullptr ? row->Cells[4]->Value->ToString() : "";
 			if (String::IsNullOrWhiteSpace(idStr)) return;
 
-			WebClient^ client = gcnew WebClient();
-			client->Encoding = System::Text::Encoding::UTF8;
-			client->Headers[HttpRequestHeader::ContentType] = "application/json";
-			client->UploadString(apiUrl + "readers/" + idStr + "/", "PATCH", "{\"is_approved\":false,\"is_active\":false}");
+			WebClient^ client = MakeAdminClient();
+			client->UploadString(apiUrl + "library-cards-admin/" + idStr + "/", "PATCH", "{\"is_approved\":false}");
 
 			row->Cells[3]->Value = L"Bloklangan";
 		}
 		catch (Exception^ ex) {
 			MessageBox::Show(L"Bloklashda xatolik: " + ex->Message);
+		}
+	}
+
+	private: System::Void btnToggleUserActive_Click(System::Object^ sender, System::EventArgs^ e) {
+		if (dgvUsers->SelectedRows->Count <= 0) {
+			MessageBox::Show(L"Amal bajarish uchun foydalanuvchini tanlang!");
+			return;
+		}
+		try {
+			DataGridViewRow^ row = dgvUsers->SelectedRows[0];
+			String^ idStr = row->Cells[0]->Value != nullptr ? row->Cells[0]->Value->ToString() : "";
+			String^ currentStatus = row->Cells[4]->Value != nullptr ? row->Cells[4]->Value->ToString() : "";
+			if (String::IsNullOrWhiteSpace(idStr)) return;
+
+			bool makeActive = (currentStatus != L"Faol");
+			
+			WebClient^ client = MakeAdminClient();
+			String^ payload = "{\"is_active\":" + (makeActive ? "true" : "false") + "}";
+			client->UploadString(apiUrl + "readers/" + idStr + "/", "PATCH", payload);
+
+			row->Cells[4]->Value = makeActive ? L"Faol" : L"Bloklangan";
+		} catch (Exception^ ex) {
+			MessageBox::Show(L"Holatni o'zgartirishda xatolik: " + ex->Message);
+		}
+	}
+
+	private: System::Void btnDeleteUser_Click(System::Object^ sender, System::EventArgs^ e) {
+		if (dgvUsers->SelectedRows->Count <= 0) {
+			MessageBox::Show(L"O'chirish uchun foydalanuvchini tanlang!");
+			return;
+		}
+		if (MessageBox::Show(L"Rostdan ham bu foydalanuvchini butunlay o'chirmoqchimisiz? Uning ijaralari va baholari ham o'chib ketishi mumkin!", L"Tasdiqlash", MessageBoxButtons::YesNo, MessageBoxIcon::Warning) == System::Windows::Forms::DialogResult::Yes) {
+			try {
+				DataGridViewRow^ row = dgvUsers->SelectedRows[0];
+				String^ idStr = row->Cells[0]->Value != nullptr ? row->Cells[0]->Value->ToString() : "";
+				if (String::IsNullOrWhiteSpace(idStr)) return;
+
+				WebClient^ client = MakeAdminClient();
+				client->UploadString(apiUrl + "readers/" + idStr + "/", "DELETE", "");
+				dgvUsers->Rows->Remove(row);
+				MessageBox::Show(L"Muvaffaqiyatli o'chirildi!");
+			} catch (Exception^ ex) {
+				MessageBox::Show(L"O'chirishda xatolik: " + ex->Message);
+			}
 		}
 	}
 
@@ -1040,6 +1347,7 @@ namespace Yakuniyloyiha {
 		dgvLibraries->Rows->Clear();
 		dgvSections->Rows->Clear();
 		dgvReaders->Rows->Clear();
+		dgvUsers->Rows->Clear();
 		dgvIssues->Rows->Clear();
 		cmbBookLibrary->Items->Clear();
 		cmbBookSection->Items->Clear();
@@ -1101,23 +1409,45 @@ namespace Yakuniyloyiha {
 				bookIds[title] = id;
 			}
 
-			// Load Readers from API
+			// Load Library Cards from API
 			readerIds->Clear();
-			String^ readJson = client->DownloadString(apiUrl + "readers/");
+			String^ readJson = client->DownloadString(apiUrl + "library-cards-admin/");
 			MatchCollection^ readMatches = Regex::Matches(readJson, "\\{[^{}]+\\}");
 			for each(Match^ m in readMatches) {
 				String^ obj = m->Value;
 				int id = Int32::Parse(Regex::Match(obj, "\"id\":(\\d+)")->Groups[1]->Value);
-				String^ fullname = Regex::Match(obj, "\"fullname\":\"([^\"]+)\"")->Groups[1]->Value;
-				String^ phone = Regex::Match(obj, "\"phone\":\"([^\"]+)\"")->Groups[1]->Value;
-				String^ cardId = Regex::Match(obj, "\"card_id\":\"([^\"]+)\"")->Groups[1]->Value;
+				int readerId = Int32::Parse(Regex::Match(obj, "\"reader_id\":(\\d+)")->Groups[1]->Value);
+				String^ fullname = Regex::Match(obj, "\"reader_name\":\"([^\"]+)\"")->Groups[1]->Value;
+				String^ phone = Regex::Match(obj, "\"reader_phone\":\"([^\"]+)\"")->Groups[1]->Value;
+				String^ libraryName = Regex::Match(obj, "\"library_name\":\"([^\"]+)\"")->Groups[1]->Value;
 				String^ cardImage = Regex::Match(obj, "\"card_image\":\"([^\"]*)\"")->Groups[1]->Value;
-				String^ approvedText = Regex::Match(obj, "\"is_approved\":(true|false)", RegexOptions::IgnoreCase)->Groups[1]->Value;
+				String^ approvedText = Regex::Match(obj, "\"is_approved\":\\s*(true|false)", RegexOptions::IgnoreCase)->Groups[1]->Value;
 				bool isApproved = approvedText->ToLower() == "true";
 				String^ statusText = isApproved ? L"Tasdiqlangan" : L"Kutilmoqda";
-				dgvReaders->Rows->Add(fullname, phone, cardId, statusText, id.ToString(), cardImage);
-				cmbIssueReader->Items->Add(fullname);
-				readerIds[fullname] = id;
+				dgvReaders->Rows->Add(fullname, phone, libraryName, statusText, id.ToString(), cardImage);
+				
+				if (!readerIds->ContainsKey(fullname)) {
+					cmbIssueReader->Items->Add(fullname);
+					readerIds[fullname] = readerId;
+				}
+			}
+
+			// Load Users
+			String^ usersJson = client->DownloadString(apiUrl + "readers/");
+			MatchCollection^ userMatches = Regex::Matches(usersJson, "\\{[^{}]+\\}");
+			for each(Match^ m in userMatches) {
+				String^ obj = m->Value;
+				int id = Int32::Parse(Regex::Match(obj, "\"id\":(\\d+)")->Groups[1]->Value);
+				String^ fullname = Regex::Match(obj, "\"fullname\":\"([^\"]+)\"")->Groups[1]->Value;
+				String^ phone = Regex::Match(obj, "\"phone\":\"([^\"]+)\"")->Groups[1]->Value;
+				String^ card_id = Regex::Match(obj, "\"card_id\":\"([^\"]+)\"")->Groups[1]->Value;
+				String^ activeStr = Regex::Match(obj, "\"is_active\":\\s*(true|false)", RegexOptions::IgnoreCase)->Groups[1]->Value;
+				String^ created_at = Regex::Match(obj, "\"created_at\":\"([^\"]+)\"")->Groups[1]->Value;
+
+				bool isActive = activeStr->ToLower() == "true";
+				String^ status = isActive ? L"Faol" : L"Bloklangan";
+				
+				dgvUsers->Rows->Add(id.ToString(), fullname, phone, card_id, status, created_at);
 			}
 
 			// Load Issues from API
@@ -1402,9 +1732,7 @@ namespace Yakuniyloyiha {
 				int libId = libIds->ContainsKey(cmbBookLibrary->Text) ? libIds[cmbBookLibrary->Text] : 0;
 				int secId = secIds->ContainsKey(cmbBookSection->Text) ? secIds[cmbBookSection->Text] : 0;
 
-				WebClient^ client = gcnew WebClient();
-				client->Encoding = System::Text::Encoding::UTF8;
-				client->Headers[HttpRequestHeader::ContentType] = "application/json";
+				WebClient^ client = MakeAdminClient();
 				String^ json = String::Format("{{\"title\":\"{0}\", \"library\":{1}, \"section\":{2}, \"shelf\":\"{3}\", \"row\":\"{4}\"}}",
 					txtBookName->Text, libId, secId, txtBookShelf->Text, txtBookRow->Text);
 				client->UploadString(apiUrl + "books/" + id + "/", "PATCH", json);
@@ -1460,9 +1788,7 @@ namespace Yakuniyloyiha {
 				return;
 			}
 
-			WebClient^ client = gcnew WebClient();
-			client->Encoding = System::Text::Encoding::UTF8;
-			client->Headers[HttpRequestHeader::ContentType] = "application/json";
+			WebClient^ client = MakeAdminClient();
 			
 			String^ json = String::Format("{{\"title\":\"{0}\", \"library\":{1}, \"section\":{2}, \"shelf\":\"{3}\", \"row\":\"{4}\"}}",
 				txtBookName->Text, libId, secId, txtBookShelf->Text, txtBookRow->Text);
@@ -1500,7 +1826,7 @@ namespace Yakuniyloyiha {
 				String^ id = row->Cells[7]->Value != nullptr ? row->Cells[7]->Value->ToString() : "";
 				if (String::IsNullOrEmpty(id)) return;
 
-				WebClient^ client = gcnew WebClient();
+				WebClient^ client = MakeAdminClient();
 				client->UploadString(apiUrl + "books/" + id + "/", "DELETE", "");
 				
 				dgvBooks->Rows->RemoveAt(row->Index);
@@ -1534,9 +1860,7 @@ namespace Yakuniyloyiha {
 		}
 
 		try {
-			WebClient^ client = gcnew WebClient();
-			client->Encoding = System::Text::Encoding::UTF8;
-			client->Headers[HttpRequestHeader::ContentType] = "application/json";
+			WebClient^ client = MakeAdminClient();
 			String^ json = String::Format("{{\"name\":\"{0}\", \"latitude\":{1}, \"longitude\":{2}}}",
 				txtLibraryName->Text, lat, lon);
 			
@@ -1561,7 +1885,7 @@ namespace Yakuniyloyiha {
 				if (!libIds->ContainsKey(name)) return;
 				
 				int id = libIds[name];
-				WebClient^ client = gcnew WebClient();
+				WebClient^ client = MakeAdminClient();
 				client->UploadString(apiUrl + "libraries/" + id + "/", "DELETE", "");
 				
 				dgvLibraries->Rows->RemoveAt(row->Index);
@@ -1581,9 +1905,7 @@ namespace Yakuniyloyiha {
 			return;
 		}
 		try {
-			WebClient^ client = gcnew WebClient();
-			client->Encoding = System::Text::Encoding::UTF8;
-			client->Headers[HttpRequestHeader::ContentType] = "application/json";
+			WebClient^ client = MakeAdminClient();
 			String^ json = String::Format("{{\"name\":\"{0}\"}}", txtSectionName->Text);
 			
 			String^ response = client->UploadString(apiUrl + "sections/", "POST", json);
@@ -1607,7 +1929,7 @@ namespace Yakuniyloyiha {
 				if (!secIds->ContainsKey(name)) return;
 				
 				int id = secIds[name];
-				WebClient^ client = gcnew WebClient();
+				WebClient^ client = MakeAdminClient();
 				client->UploadString(apiUrl + "sections/" + id + "/", "DELETE", "");
 				
 				dgvSections->Rows->RemoveAt(row->Index);
@@ -1634,9 +1956,7 @@ namespace Yakuniyloyiha {
 			return;
 		}
 		try {
-			WebClient^ client = gcnew WebClient();
-			client->Encoding = System::Text::Encoding::UTF8;
-			client->Headers[HttpRequestHeader::ContentType] = "application/json";
+			WebClient^ client = MakeAdminClient();
 			String^ json = String::Format("{{\"fullname\":\"{0}\",\"phone\":\"{1}\",\"card_id\":\"{2}\"}}",
 				name, phone, cardId);
 			String^ response = client->UploadString(apiUrl + "readers/", "POST", json);
@@ -1665,7 +1985,7 @@ namespace Yakuniyloyiha {
 				String^ idStr = row->Cells[4]->Value != nullptr ? row->Cells[4]->Value->ToString() : "";
 				if (String::IsNullOrEmpty(idStr)) return;
 				int id = Int32::Parse(idStr);
-				WebClient^ client = gcnew WebClient();
+				WebClient^ client = MakeAdminClient();
 				client->UploadString(apiUrl + "readers/" + id + "/", "DELETE", "");
 				String^ name = row->Cells[0]->Value != nullptr ? row->Cells[0]->Value->ToString() : "";
 				dgvReaders->Rows->RemoveAt(row->Index);
@@ -1692,9 +2012,7 @@ namespace Yakuniyloyiha {
 			int readerId = readerIds[cmbIssueReader->Text];
 			int bookId = bookIds[cmbIssueBook->Text];
 			String^ retDate = dtpReturnDate->Value.ToString("yyyy-MM-dd");
-			WebClient^ client = gcnew WebClient();
-			client->Encoding = System::Text::Encoding::UTF8;
-			client->Headers[HttpRequestHeader::ContentType] = "application/json";
+			WebClient^ client = MakeAdminClient();
 			String^ json = String::Format("{{\"reader\":{0},\"book\":{1},\"return_date\":\"{2}\"}}",
 				readerId, bookId, retDate);
 			String^ response = client->UploadString(apiUrl + "issues/", "POST", json);
@@ -1719,7 +2037,7 @@ namespace Yakuniyloyiha {
 				String^ idStr = row->Cells[4]->Value != nullptr ? row->Cells[4]->Value->ToString() : "";
 				if (String::IsNullOrEmpty(idStr)) return;
 				int id = Int32::Parse(idStr);
-				WebClient^ client = gcnew WebClient();
+				WebClient^ client = MakeAdminClient();
 				client->UploadString(apiUrl + "issues/" + id + "/", "DELETE", "");
 				dgvIssues->Rows->RemoveAt(row->Index);
 				LoadInsights();

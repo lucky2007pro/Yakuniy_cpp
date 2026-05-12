@@ -134,6 +134,7 @@ namespace Yakuniyloyiha {
 	private: System::Windows::Forms::Button^ btnReader;
 	private: System::Windows::Forms::Button^ btnSettings;
 	private: System::Windows::Forms::Button^ btnHistory;
+	private: System::Windows::Forms::Button^ btnTopBooks;
 	private: System::Windows::Forms::Label^ lblFilterLib;
 	private: System::Windows::Forms::Label^ lblFilterSec;
 	private: System::Windows::Forms::Label^ lblRadius;
@@ -159,6 +160,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		String^ apiUrl = serverUrl + L"/api/";
 		int currentReaderId = -1;
 		String^ currentReaderName = L"";
+		String^ currentReaderPhone = L"";
 		String^ currentReaderCardId = L"";
 		String^ currentReaderToken = nullptr;
 		bool currentReaderApproved = false;
@@ -180,6 +182,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			this->btnReader = (gcnew System::Windows::Forms::Button());
 			this->btnSettings = (gcnew System::Windows::Forms::Button());
 			this->btnHistory = (gcnew System::Windows::Forms::Button());
+			this->btnTopBooks = (gcnew System::Windows::Forms::Button());
 			this->flpResults = (gcnew System::Windows::Forms::FlowLayoutPanel());
 			this->SuspendLayout();
 			// 
@@ -233,42 +236,52 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			// btnAbout
 			// 
 			this->btnAbout->Location = System::Drawing::Point(740, 12);
-			this->btnAbout->Name = L"btnAbout";
-			this->btnAbout->Size = System::Drawing::Size(90, 30);
-			this->btnAbout->TabIndex = 6;
-			this->btnAbout->Text = L"Haqida";
-			this->btnAbout->UseVisualStyleBackColor = true;
-			this->btnAbout->Click += gcnew System::EventHandler(this, &MyForm::btnAbout_Click);
+		 this->btnAbout->Name = L"btnAbout";
+		 this->btnAbout->Size = System::Drawing::Size(90, 30);
+		 this->btnAbout->TabIndex = 6;
+		 this->btnAbout->Text = L"Haqida";
+		 this->btnAbout->UseVisualStyleBackColor = true;
+		 this->btnAbout->Click += gcnew System::EventHandler(this, &MyForm::btnAbout_Click);
          // 
 			// btnReader
 			// 
 			this->btnReader->Location = System::Drawing::Point(840, 12);
-			this->btnReader->Name = L"btnReader";
-			this->btnReader->Size = System::Drawing::Size(90, 30);
-			this->btnReader->TabIndex = 7;
-			this->btnReader->Text = L"O'quvchi";
-			this->btnReader->UseVisualStyleBackColor = true;
-			this->btnReader->Click += gcnew System::EventHandler(this, &MyForm::btnReader_Click);
+		 this->btnReader->Name = L"btnReader";
+		 this->btnReader->Size = System::Drawing::Size(90, 30);
+		 this->btnReader->TabIndex = 7;
+		 this->btnReader->Text = L"O'quvchi";
+		 this->btnReader->UseVisualStyleBackColor = true;
+		 this->btnReader->Click += gcnew System::EventHandler(this, &MyForm::btnReader_Click);
 			// 
 			// btnSettings
 			// 
 			this->btnSettings->Location = System::Drawing::Point(1030, 12);
-			this->btnSettings->Name = L"btnSettings";
-			this->btnSettings->Size = System::Drawing::Size(90, 30);
-			this->btnSettings->TabIndex = 9;
-			this->btnSettings->Text = L"Sozlamalar";
-			this->btnSettings->UseVisualStyleBackColor = true;
-			this->btnSettings->Click += gcnew System::EventHandler(this, &MyForm::btnSettings_Click);
+		 this->btnSettings->Name = L"btnSettings";
+		 this->btnSettings->Size = System::Drawing::Size(90, 30);
+		 this->btnSettings->TabIndex = 9;
+		 this->btnSettings->Text = L"Sozlamalar";
+		 this->btnSettings->UseVisualStyleBackColor = true;
+		 this->btnSettings->Click += gcnew System::EventHandler(this, &MyForm::btnSettings_Click);
 			// 
 			// btnHistory
 			// 
 			this->btnHistory->Location = System::Drawing::Point(930, 12);
-			this->btnHistory->Name = L"btnHistory";
-			this->btnHistory->Size = System::Drawing::Size(90, 30);
-			this->btnHistory->TabIndex = 8;
-			this->btnHistory->Text = L"Tarix";
-			this->btnHistory->UseVisualStyleBackColor = true;
-			this->btnHistory->Click += gcnew System::EventHandler(this, &MyForm::btnHistory_Click);
+		 this->btnHistory->Name = L"btnHistory";
+		 this->btnHistory->Size = System::Drawing::Size(90, 30);
+		 this->btnHistory->TabIndex = 8;
+		 this->btnHistory->Text = L"Tarix";
+		 this->btnHistory->UseVisualStyleBackColor = true;
+		 this->btnHistory->Click += gcnew System::EventHandler(this, &MyForm::btnHistory_Click);
+			// 
+			// btnTopBooks
+			// 
+			this->btnTopBooks->Location = System::Drawing::Point(540, 12);
+		 this->btnTopBooks->Name = L"btnTopBooks";
+		 this->btnTopBooks->Size = System::Drawing::Size(96, 30);
+		 this->btnTopBooks->TabIndex = 9;
+		 this->btnTopBooks->Text = L"Top kitoblar";
+		 this->btnTopBooks->UseVisualStyleBackColor = true;
+		 this->btnTopBooks->Click += gcnew System::EventHandler(this, &MyForm::btnTopBooks_Click);
 			// 
 			// flpResults
 			// 
@@ -289,6 +302,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			this->Controls->Add(this->btnStat);
 			this->Controls->Add(this->btnAbout);
 			this->Controls->Add(this->btnHistory);
+			this->Controls->Add(this->btnTopBooks);
 			this->Controls->Add(this->btnSettings);
 			this->Controls->Add(this->txtSearch);
 			this->Controls->Add(this->lblSearch);
@@ -413,6 +427,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		right = PlaceHeaderButton(btnAbout, right, topY, 82, gap);
 		right = PlaceHeaderButton(btnHistory, right, topY, 82, gap);
 		right = PlaceHeaderButton(btnStat, right, topY, 90, gap);
+		right = PlaceHeaderButton(btnTopBooks, right, topY, 108, gap);
 		right = PlaceHeaderButton(btnReader, right, topY, 108, gap);
 
 		lblSearch->Location = System::Drawing::Point(margin, 20);
@@ -577,6 +592,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		Color accentColor = AppSettings::PrimaryColor();
 		Color textColor = AppSettings::TextColor();
 		Color textMuted = AppSettings::MutedTextColor();
+		Color elevatedColor = AppSettings::ElevatedColor();
 
 		this->Text = AppSettings::Translate(L"Kutubxona Tizimi", L"Library System", L"Библиотечная система");
 		lblSearch->Text = AppSettings::Translate(L"Kitob nomi (qidiruv):", L"Book title (search):", L"Название книги (поиск):");
@@ -587,6 +603,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		btnHistory->Text = AppSettings::Translate(L"Tarix", L"History", L"История");
 		btnSettings->Text = AppSettings::Translate(L"Sozlamalar", L"Settings", L"Настройки");
 		btnAdmin->Text = AppSettings::Translate(L"Admin", L"Admin", L"Админ");
+		btnTopBooks->Text = AppSettings::Translate(L"⭐ Top kitoblar", L"⭐ Top books", L"⭐ Топ книги");
 		lblFilterLib->Text = AppSettings::Translate(L"Kutubxona:", L"Library:", L"Библиотека:");
 		lblFilterSec->Text = AppSettings::Translate(L"Bo'lim:", L"Section:", L"Раздел:");
 		lblRadius->Text = AppSettings::Translate(L"Radius:", L"Radius:", L"Радиус:");
@@ -613,29 +630,41 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		this->ForeColor = textColor;
 		this->Font = (gcnew System::Drawing::Font(L"Segoe UI", 10.5F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
 
-		lblSearch->Font = (gcnew System::Drawing::Font(L"Segoe UI Semibold", 11.5F, System::Drawing::FontStyle::Bold));
-		lblSearch->ForeColor = textColor;
+		AppSettings::StyleSectionTitle(lblSearch);
 		lblSearch->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left);
+		AppSettings::StyleInput(txtSearch);
 		txtSearch->Font = (gcnew System::Drawing::Font(L"Segoe UI", 11.5F));
-		txtSearch->BackColor = panelBg;
-		txtSearch->ForeColor = textColor;
-		txtSearch->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
 		txtSearch->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left | AnchorStyles::Right);
 
        lblSearch->Location = System::Drawing::Point(20, 25);
 		txtSearch->Location = System::Drawing::Point(230, 22);
 		txtSearch->Size = System::Drawing::Size(270, 30);
 
-        array<Button^>^ buttons = { btnSearch, btnReader, btnStat, btnHistory, btnAbout, btnSettings, btnAdmin, btnShowAll };
+		// Secondary tugmalar uchun border rangi — oq fonda ham ajralib tursin
+		Color secondaryBtnBg = AppSettings::DarkMode
+			? System::Drawing::Color::FromArgb(34, 39, 45)
+			: System::Drawing::Color::FromArgb(244, 246, 250);
+		Color secondaryBorder = AppSettings::DarkMode
+			? System::Drawing::Color::FromArgb(55, 65, 81)
+			: System::Drawing::Color::FromArgb(209, 213, 219);
+
+        array<Button^>^ buttons = { btnSearch, btnReader, btnStat, btnHistory, btnAbout, btnSettings, btnAdmin, btnShowAll, btnTopBooks };
 		for each (Button^ btn in buttons) {
 			if (btn != nullptr) {
-				btn->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
-				btn->FlatAppearance->BorderSize = 0;
-				btn->Font = (gcnew System::Drawing::Font(L"Segoe UI Semibold", 10.0F, System::Drawing::FontStyle::Bold));
-				btn->ForeColor = System::Drawing::Color::White;
-				btn->Cursor = System::Windows::Forms::Cursors::Hand;
-				btn->Height = 35;
+				AppSettings::StyleModernButton(btn, true);
+				btn->Height = 38;
 			}
+		}
+
+		// Secondary (ikkilamchi) tugmalarga rounded + border qo'shamiz — light mode'da ko'rinib tursin
+		array<Button^>^ secondaryBtns = { btnReader, btnStat, btnHistory, btnAbout, btnSettings, btnShowAll, btnTopBooks };
+		for each (Button^ sb in secondaryBtns) {
+			if (sb == nullptr) continue;
+			sb->BackColor = AppSettings::ElevatedColor();
+			sb->ForeColor = textColor;
+			sb->FlatAppearance->BorderSize = 2;
+			sb->FlatAppearance->BorderColor = AppSettings::BorderColor();
+			sb->FlatAppearance->MouseOverBackColor = AppSettings::CardHoverColor();
 		}
 
 		btnSearch->Location = System::Drawing::Point(510, 20);
@@ -646,33 +675,23 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 
 		btnReader->Location = System::Drawing::Point(600, 20);
 		btnReader->Size = System::Drawing::Size(108, 35);
-		btnReader->BackColor = panelBg;
-		btnReader->ForeColor = textColor;
 		btnReader->Text = AppSettings::Translate(L"Kirish", L"Login", L"Вход");
 		btnReader->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
 
 		btnStat->Location = System::Drawing::Point(700, 20);
 		btnStat->Size = System::Drawing::Size(90, 35);
-		btnStat->BackColor = panelBg;
-		btnStat->ForeColor = textColor;
 		btnStat->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
 
 		btnHistory->Location = System::Drawing::Point(800, 20);
 		btnHistory->Size = System::Drawing::Size(80, 35);
-		btnHistory->BackColor = panelBg;
-		btnHistory->ForeColor = textColor;
 		btnHistory->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
 
 		btnAbout->Location = System::Drawing::Point(890, 20);
 		btnAbout->Size = System::Drawing::Size(80, 35);
-		btnAbout->BackColor = panelBg;
-		btnAbout->ForeColor = textColor;
 		btnAbout->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
 
-        btnSettings->Location = System::Drawing::Point(980, 20);
+		btnSettings->Location = System::Drawing::Point(980, 20);
 		btnSettings->Size = System::Drawing::Size(105, 35);
-		btnSettings->BackColor = panelBg;
-		btnSettings->ForeColor = textColor;
 		btnSettings->Text = AppSettings::Translate(L"Sozlamalar", L"Settings", L"Настройки");
 		btnSettings->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
 
@@ -687,9 +706,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		lblFilterLib->Location = System::Drawing::Point(20, 70);
 		cmbFilterLibrary->Location = System::Drawing::Point(115, 68);
 		cmbFilterLibrary->Size = System::Drawing::Size(200, 30);
-		cmbFilterLibrary->BackColor = panelBg;
-		cmbFilterLibrary->ForeColor = textColor;
-		cmbFilterLibrary->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
+		AppSettings::StyleInput(cmbFilterLibrary);
 		cmbFilterLibrary->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 		cmbFilterLibrary->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left);
 
@@ -698,9 +715,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		lblFilterSec->Location = System::Drawing::Point(335, 70);
 		cmbFilterSection->Location = System::Drawing::Point(395, 68);
 		cmbFilterSection->Size = System::Drawing::Size(180, 30);
-		cmbFilterSection->BackColor = panelBg;
-		cmbFilterSection->ForeColor = textColor;
-		cmbFilterSection->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
+		AppSettings::StyleInput(cmbFilterSection);
 		cmbFilterSection->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 		cmbFilterSection->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left);
 
@@ -721,18 +736,14 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		lblRadius->Location = System::Drawing::Point(590, 70);
 		cmbRadius->Location = System::Drawing::Point(650, 68);
 		cmbRadius->Size = System::Drawing::Size(130, 30);
-		cmbRadius->BackColor = panelBg;
-		cmbRadius->ForeColor = textColor;
-		cmbRadius->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
+		AppSettings::StyleInput(cmbRadius);
 		cmbRadius->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 		cmbRadius->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left);
 
 		lblSort->Location = System::Drawing::Point(940, 70);
 		cmbSort->Location = System::Drawing::Point(1015, 68);
 		cmbSort->Size = System::Drawing::Size(180, 30);
-		cmbSort->BackColor = panelBg;
-		cmbSort->ForeColor = textColor;
-		cmbSort->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
+		AppSettings::StyleInput(cmbSort);
 		cmbSort->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 		cmbSort->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left);
 
@@ -745,7 +756,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		btnShowAll->Text = AppSettings::Translate(L"Barchasi", L"Reset", L"Сброс");
         btnShowAll->Location = System::Drawing::Point(940, 65);
 		btnShowAll->Size = System::Drawing::Size(108, 35);
-		btnShowAll->BackColor = panelBg;
+		// BackColor yuqoridagi secondary loop tomonidan o'rnatiladi — ko'rinadigan border bilan
 		btnShowAll->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
 
 		array<Button^>^ statusButtons = { btnStatusAll, btnStatusAvailable, btnStatusReserved, btnStatusIssued };
@@ -755,7 +766,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			sb->FlatAppearance->BorderSize = 0;
 			sb->Font = gcnew System::Drawing::Font(L"Segoe UI", 9.0F, System::Drawing::FontStyle::Bold);
 			sb->Cursor = System::Windows::Forms::Cursors::Hand;
-			MakeRounded(sb, 12);
+			AppSettings::MakeRounded(sb, 12);
 		}
 
 		Color chipBg = AppSettings::ElevatedColor();
@@ -791,10 +802,10 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 
 	    flpResults->Location = System::Drawing::Point(14, 148);
 		flpResults->Size = System::Drawing::Size(1200, 450);
-		flpResults->BackColor = darkBg;
+		flpResults->BackColor = elevatedColor;
 		flpResults->AutoScroll = true;
 		flpResults->WrapContents = true;
-		flpResults->Padding = System::Windows::Forms::Padding(10);
+		flpResults->Padding = System::Windows::Forms::Padding(12);
 		flpResults->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Bottom | AnchorStyles::Left | AnchorStyles::Right);
 
 		this->MinimumSize = System::Drawing::Size(1080, 680);
@@ -806,8 +817,6 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		lblMarquee->BringToFront();
 		UpdateResponsiveLayout();
 		UpdateReaderButtonState();
-
-      MakeRounded(btnSearch, 8); MakeRounded(btnAdmin, 8); MakeRounded(btnShowAll, 8); MakeRounded(btnStat, 8); MakeRounded(btnAbout, 8); MakeRounded(btnReader, 8); MakeRounded(btnSettings, 8); MakeRounded(btnHistory, 8);
 	}
 
 	private: System::Void MakeRounded(Control^ ctrl, int radius) {
@@ -942,6 +951,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				String^ ebookPath = Regex::Match(obj, "\"ebook_file\":\"([^\"]+)\"")->Groups[1]->Value;
 				String^ coverImg = Regex::Match(obj, "\"cover_image\":\"([^\"]+)\"")->Groups[1]->Value;
 				String^ bookIdText = Regex::Match(obj, "\"id\":(\\d+)")->Groups[1]->Value;
+				String^ libIdText = Regex::Match(obj, "\"library\":(\\d+)")->Groups[1]->Value;
 				String^ libLatText = Regex::Match(obj, "\"library_latitude\":(-?[\\d\\.]+)")->Groups[1]->Value;
 				String^ libLonText = Regex::Match(obj, "\"library_longitude\":(-?[\\d\\.]+)")->Groups[1]->Value;
 
@@ -1001,7 +1011,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 					}
 					if (!statusMatches) continue;
 
-					array<Object^>^ resRow = gcnew array<Object^>(13);
+					array<Object^>^ resRow = gcnew array<Object^>(14);
 					resRow[0] = img;
 					resRow[1] = title;
 					resRow[2] = libName;
@@ -1014,7 +1024,8 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 					resRow[9] = libLat.ToString(System::Globalization::CultureInfo::InvariantCulture);
 					resRow[10] = libLon.ToString(System::Globalization::CultureInfo::InvariantCulture);
 					resRow[11] = (ebookPath == "null") ? "" : ebookPath;
-					resRow[12] = bookIdText;
+					resRow[12] = bookIdText;  // book ID
+					resRow[13] = libIdText;   // library ID
 
 					results->Add(resRow);
 				}
@@ -1093,8 +1104,6 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				lblTitle->Name = L"title";
 				lblTitle->Text = res[1]->ToString();
 				lblTitle->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 11.5F, System::Drawing::FontStyle::Bold);
-				lblTitle->Size = System::Drawing::Size(cardWidth - 20, 45);
-				lblTitle->Location = System::Drawing::Point(10, imageHeight + 10);
 				lblTitle->ForeColor = AppSettings::TextColor();
 
 				Label^ lblDist = gcnew Label();
@@ -1170,7 +1179,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				lblStat->Click += clickHnd;
 				lblMeta->Click += clickHnd;
 				btnMiniOpen->Click += clickHnd;
-				btnMiniRoute->Click += gcnew EventHandler(this, &MyForm::btnMap_Click);
+				btnMiniRoute->Click += gcnew System::EventHandler(this, &MyForm::btnMap_Click);
 				card->MouseEnter += hoverInHnd;
 				pb->MouseEnter += hoverInHnd;
 				lblTitle->MouseEnter += hoverInHnd;
@@ -1272,7 +1281,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			Label^ loadingText = gcnew Label();
 			loadingText->Text = AppSettings::Translate(L"Yuklanmoqda...", L"Loading...", L"Загрузка...");
 			loadingText->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(170, 176, 180) : System::Drawing::Color::FromArgb(130, 138, 145);
-			loadingText->Font = gcnew System::Drawing::Font(L"Segoe UI", 8.5F, System::Drawing::FontStyle::Regular);
+			loadingText->Font = gcnew System::Drawing::Font(L"Segoe UI", 10.5F, System::Drawing::FontStyle::Regular);
 			loadingText->Location = System::Drawing::Point(10, imageHeight + 60);
 			loadingText->AutoSize = true;
 
@@ -1320,7 +1329,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		int yp = 30 + t->Height + 20;
 
 		Label^ l1 = gcnew Label();
-		l1->Text = AppSettings::Translate(L"Kutubxona: ", L"Library: ", L"Библиотека: ") + res[2]->ToString();
+		l1->Text = AppSettings::Translate(L"Kutubxona: ", L"Library: ", L"Библиотека") + res[2]->ToString();
 		l1->Location = System::Drawing::Point(230, yp);
 		l1->AutoSize = true;
 		l1->Font = gcnew System::Drawing::Font(L"Segoe UI", 11.0F, System::Drawing::FontStyle::Regular);
@@ -1329,8 +1338,8 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		yp += 30;
 
 		Label^ l2 = gcnew Label();
-		l2->Text = AppSettings::Translate(L"Bo'lim: ", L"Section: ", L"Раздел: ") + res[3]->ToString();
-		l2->Location = System::Drawing::Point(230, yp);
+		l2->Text = AppSettings::Translate(L"Bo'lim: ", L"Section: ", L"Раздел") + res[3]->ToString();
+	 l2->Location = System::Drawing::Point(230, yp);
 		l2->AutoSize = true;
 		l2->Font = gcnew System::Drawing::Font(L"Segoe UI", 11.0F, System::Drawing::FontStyle::Regular);
 		l2->ForeColor = mutColor;
@@ -1415,14 +1424,15 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		GroupBox^ reserveBox = gcnew GroupBox();
 		reserveBox->Text = AppSettings::Translate(L"Masofadan band qilish", L"Remote reservation", L"Удаленное бронирование");
 		reserveBox->Location = System::Drawing::Point(30, 285);
-		reserveBox->Size = System::Drawing::Size(590, 130);
+		reserveBox->Size = System::Drawing::Size(590, 140);
 		reserveBox->ForeColor = txtColor;
 		reserveBox->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 10.5F, System::Drawing::FontStyle::Bold);
 
+		// Info label — tugmalarning tepasida, to'liq kenglikda (overlap yo'q)
 		Label^ reserveInfo = gcnew Label();
 		reserveInfo->AutoSize = false;
-		reserveInfo->Location = System::Drawing::Point(16, 30);
-		reserveInfo->Size = System::Drawing::Size(400, 78);
+		reserveInfo->Location = System::Drawing::Point(16, 28);
+		reserveInfo->Size = System::Drawing::Size(558, 48);
 		reserveInfo->ForeColor = mutColor;
 		reserveInfo->Font = gcnew System::Drawing::Font(L"Segoe UI", 9.0F, System::Drawing::FontStyle::Regular);
 		reserveInfo->Text = AppSettings::Translate(
@@ -1432,15 +1442,33 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		);
 		reserveBox->Controls->Add(reserveInfo);
 
+		// Baholash tugmasi — chap tomonda (info labeldan keyin alohida qatorda)
+		Button^ btnRate = gcnew Button();
+		btnRate->Text = AppSettings::Translate(L"★ Baholash", L"★ Rate", L"★ Оценить");
+		btnRate->Location = System::Drawing::Point(16, 88);
+		btnRate->Size = System::Drawing::Size(160, 40);
+		btnRate->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
+		btnRate->FlatAppearance->BorderSize = 0;
+		btnRate->BackColor = System::Drawing::Color::FromArgb(243, 156, 18);
+		btnRate->ForeColor = System::Drawing::Color::White;
+		btnRate->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 10.0F, System::Drawing::FontStyle::Bold);
+		btnRate->Cursor = System::Windows::Forms::Cursors::Hand;
+		btnRate->Tag = res;
+		btnRate->Click += gcnew System::EventHandler(this, &MyForm::btnRateBook_Click);
+		MakeRounded(btnRate, 10);
+		reserveBox->Controls->Add(btnRate);
+
+		// Band qilish tugmasi — o'ng tomonda
 		Button^ btnReserve = gcnew Button();
 		btnReserve->Text = AppSettings::Translate(L"Band qilish", L"Reserve", L"Забронировать");
-		btnReserve->Location = System::Drawing::Point(430, 76);
-		btnReserve->Size = System::Drawing::Size(140, 36);
+		btnReserve->Location = System::Drawing::Point(414, 88);
+		btnReserve->Size = System::Drawing::Size(160, 40);
 		btnReserve->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
 		btnReserve->FlatAppearance->BorderSize = 0;
 		btnReserve->BackColor = System::Drawing::Color::FromArgb(22, 160, 133);
 		btnReserve->ForeColor = System::Drawing::Color::White;
 		btnReserve->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 10.0F, System::Drawing::FontStyle::Bold);
+		btnReserve->Cursor = System::Windows::Forms::Cursors::Hand;
 		btnReserve->Tag = res;
 		btnReserve->Click += gcnew System::EventHandler(this, &MyForm::btnReserve_Click);
 		MakeRounded(btnReserve, 10);
@@ -1452,6 +1480,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			: AppSettings::Translate(L"Bu kitob hozircha band qilish uchun mavjud emas.", L"This book is currently unavailable for reservation.", L"Эта книга сейчас недоступна для бронирования.");
 
 		reserveBox->Controls->Add(btnReserve);
+
 		fd->Controls->Add(reserveBox);
 
 		fd->AcceptButton = btnOk;
@@ -1467,23 +1496,32 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 	private: System::Void UpdateReaderButtonState() {
 		if (btnReader == nullptr) return;
 
+		// Rounded + flat styling — har holatda bir xil
+		btnReader->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
+
 		if (String::IsNullOrWhiteSpace(currentReaderToken)) {
+			// Login qilinmagan — subtle neutral fon + ko'rinadigan border (oq sahifada ham ajralib tursin)
 			btnReader->Text = AppSettings::Translate(L"Kirish", L"Login", L"Вход");
-			btnReader->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(34, 39, 45) : System::Drawing::Color::White;
-			btnReader->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(236, 240, 241) : System::Drawing::Color::FromArgb(33, 37, 41);
+			btnReader->BackColor = AppSettings::DarkMode
+				? System::Drawing::Color::FromArgb(34, 39, 45)
+				: System::Drawing::Color::FromArgb(244, 246, 250);
+			btnReader->ForeColor = AppSettings::DarkMode
+				? System::Drawing::Color::FromArgb(236, 240, 241)
+				: System::Drawing::Color::FromArgb(33, 37, 41);
+			btnReader->FlatAppearance->BorderSize = 1;
+			btnReader->FlatAppearance->BorderColor = AppSettings::DarkMode
+				? System::Drawing::Color::FromArgb(55, 65, 81)
+				: System::Drawing::Color::FromArgb(209, 213, 219);
+			MakeRounded(btnReader, 8);
 			return;
 		}
 
-		if (currentReaderApproved) {
-			btnReader->Text = AppSettings::Translate(L"Kabinet ✓", L"Account ✓", L"Аккаунт ✓");
-			btnReader->BackColor = System::Drawing::Color::FromArgb(46, 204, 113);
-			btnReader->ForeColor = System::Drawing::Color::White;
-		}
-		else {
-			btnReader->Text = AppSettings::Translate(L"Tekshiruvda", L"Pending", L"Проверка");
-			btnReader->BackColor = System::Drawing::Color::FromArgb(240, 156, 0);
-			btnReader->ForeColor = System::Drawing::Color::White;
-		}
+		// Login qilingan — to'liq rangli fon, border kerak emas
+		btnReader->FlatAppearance->BorderSize = 0;
+		btnReader->Text = AppSettings::Translate(L"Kabinet ✓", L"Account ✓", L"Аккаунт ✓");
+		btnReader->BackColor = System::Drawing::Color::FromArgb(46, 204, 113);
+		btnReader->ForeColor = System::Drawing::Color::White;
+		MakeRounded(btnReader, 8);
 	}
 
 	private: bool LoginReader(String^ cardId, String^ password) {
@@ -1542,6 +1580,46 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		UpdateReaderButtonState();
 	}
 
+	// Server bilan reader is_approved/is_active statusini real vaqtda
+	// sinxronlashtiradigan yengil metod. Login bo'lmagan bo'lsa hech nima
+	// qilmasdan false qaytaradi. Token noto'g'ri bo'lsa ham loyihaga zarar
+	// keltirmaydi (avtomatik logout qilinmaydi - faqat oldingi qiymat saqlanadi).
+	private: bool RefreshReaderStatus() {
+		if (String::IsNullOrWhiteSpace(currentReaderToken) || currentReaderId <= 0) return false;
+		try {
+			WebClient^ cl = gcnew WebClient();
+			cl->Encoding = System::Text::Encoding::UTF8;
+			cl->Headers->Add("Authorization", "Bearer " + currentReaderToken);
+			cl->Headers->Add("X-Reader-Token", currentReaderToken);
+			String^ resp = cl->DownloadString(apiUrl + "readers/refresh-status/");
+			Match^ approvedM = Regex::Match(resp, "\"is_approved\"\\s*:\\s*(true|false)", RegexOptions::IgnoreCase);
+			Match^ activeM = Regex::Match(resp, "\"is_active\"\\s*:\\s*(true|false)", RegexOptions::IgnoreCase);
+			if (approvedM->Success) {
+				bool newApproved = approvedM->Groups[1]->Value->ToLower() == "true";
+				bool newActive = activeM->Success ? (activeM->Groups[1]->Value->ToLower() == "true") : true;
+				bool changed = (newApproved != currentReaderApproved);
+				currentReaderApproved = newApproved;
+				if (!newActive) {
+					// Server tomondan akkaunt bloklanganida — chiqib yuborish.
+					LogoutReader();
+					MessageBox::Show(
+						AppSettings::Translate(L"Akkauntingiz bloklangan.", L"Your account is blocked.", L"Ваш аккаунт заблокирован"),
+						AppSettings::Translate(L"Bloklandi", L"Blocked", L"Заблокирован"),
+						MessageBoxButtons::OK,
+						MessageBoxIcon::Warning
+					);
+					return true;
+				}
+				if (changed) UpdateReaderButtonState();
+				return true;
+			}
+		}
+		catch (...) {
+			// Tarmoq xatoligida statusni o'zgartirmaymiz - oxirgi qiymat saqlanadi.
+		}
+		return false;
+	}
+
 	private: System::Void LoadReaderLibraryCardsGrid(DataGridView^ dgvCards) {
 		if (dgvCards != nullptr) dgvCards->Rows->Clear();
 		if (currentReaderId <= 0 || dgvCards == nullptr || String::IsNullOrWhiteSpace(currentReaderToken)) return;
@@ -1555,8 +1633,8 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			MatchCollection^ cardRows = Regex::Matches(cardsJson, "\\{[^{}]+\\}");
 			for each(Match^ m in cardRows) {
 				String^ obj = m->Value;
-				String^ libraryName = Regex::Match(obj, "\"library_name\":\"([^\"]*)\"")->Groups[1]->Value;
-				String^ updatedAt = Regex::Match(obj, "\"updated_at\":\"([^\"]*)\"")->Groups[1]->Value;
+				String^ libraryName = Regex::Match(obj, "\"library_name\":\"([^\"]+)\"")->Groups[1]->Value;
+				String^ updatedAt = Regex::Match(obj, "\"updated_at\":\"([^\"]+)\"")->Groups[1]->Value;
 				if (String::IsNullOrWhiteSpace(libraryName)) continue;
 				dgvCards->Rows->Add(libraryName, updatedAt);
 			}
@@ -1634,8 +1712,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			uploadCl->Headers[HttpRequestHeader::ContentType] = "application/json";
 			uploadCl->Headers->Add("Authorization", "Bearer " + currentReaderToken);
 			uploadCl->Headers->Add("X-Reader-Token", currentReaderToken);
-			String^ payload = String::Format(
-				"{{\"library\":{0},\"card_image_base64\":\"{1}\"}}",
+			String^ payload = String::Format("{{\"library\":{0},\"card_image_base64\":\"{1}\"}}",
 				libraryIdText,
 				EscapeJson(cardB64)
 			);
@@ -1706,6 +1783,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				if (String::IsNullOrWhiteSpace(ridText)) continue;
 				if (Int32::Parse(ridText) != currentReaderId) continue;
 
+				String^ resvIdText = Regex::Match(obj, "\"id\":(\\d+)")->Groups[1]->Value;
 				String^ bookTitle = Regex::Match(obj, "\"book_title\":\"([^\"]*)\"")->Groups[1]->Value;
 				String^ reservedAt = Regex::Match(obj, "\"reserved_at\":\"([^\"]*)\"")->Groups[1]->Value;
 				String^ note = Regex::Match(obj, "\"note\":\"([^\"]*)\"")->Groups[1]->Value;
@@ -1714,94 +1792,217 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 					: AppSettings::Translate(L"Faol bron", L"Active reservation", L"Активная бронь");
 
 				if (dgvReservations != nullptr) {
-					dgvReservations->Rows->Add(bookTitle, reservedAt, note, reserveStatus);
+					int idx = dgvReservations->Rows->Add(bookTitle, reservedAt, note, reserveStatus, resvIdText);
+					(void)idx;
 				}
 			}
 		}
 		catch (...) {}
 	}
 
+	// Foydalanuvchining tanlangan bronini bekor qilish (faqat o'zining bronini).
+	private: System::Void btnCancelReservation_Click(System::Object^ sender, System::EventArgs^ e) {
+		Button^ btn = dynamic_cast<Button^>(sender);
+		if (btn == nullptr || btn->Tag == nullptr) return;
+		array<Object^>^ tagPair = dynamic_cast<array<Object^>^>(btn->Tag);
+		if (tagPair == nullptr || tagPair->Length < 2) return;
+		DataGridView^ dgvRes = dynamic_cast<DataGridView^>(tagPair[0]);
+		DataGridView^ dgvIs = dynamic_cast<DataGridView^>(tagPair[1]);
+		if (dgvRes == nullptr || dgvRes->SelectedRows->Count <= 0) {
+			MessageBox::Show(
+				AppSettings::Translate(L"Bekor qilish uchun bronni tanlang.", L"Select a reservation to cancel.", L"Выберите бронь для отмены."),
+				AppSettings::Translate(L"Ma'lumot", L"Info", L"Информация"),
+				MessageBoxButtons::OK,
+				MessageBoxIcon::Information
+			);
+			return;
+		}
+
+		DataGridViewRow^ row = dgvRes->SelectedRows[0];
+		String^ resvId = row->Cells->Count > 4 && row->Cells[4]->Value != nullptr ? row->Cells[4]->Value->ToString() : L"";
+		if (String::IsNullOrWhiteSpace(resvId)) return;
+
+		System::Windows::Forms::DialogResult dr = MessageBox::Show(
+			AppSettings::Translate(L"Tanlangan bronni bekor qilasizmi?", L"Cancel the selected reservation?", L"Отменить выбранную бронь?"),
+			AppSettings::Translate(L"Tasdiqlash", L"Confirm", L"Подтверждение"),
+			MessageBoxButtons::YesNo,
+			MessageBoxIcon::Question
+		);
+		if (dr != System::Windows::Forms::DialogResult::Yes) return;
+
+		try {
+			WebClient^ cl = gcnew WebClient();
+			cl->Encoding = System::Text::Encoding::UTF8;
+			cl->Headers->Add("Authorization", "Bearer " + currentReaderToken);
+			cl->Headers->Add("X-Reader-Token", currentReaderToken);
+			cl->UploadString(apiUrl + "reservations/" + resvId + "/", "DELETE", "");
+
+			MessageBox::Show(
+				AppSettings::Translate(L"Bron bekor qilindi.", L"Reservation cancelled.", L"Бронь отменена."),
+				AppSettings::Translate(L"Tayyor", L"Done", L"Готово"),
+				MessageBoxButtons::OK,
+				MessageBoxIcon::Information
+			);
+			LoadReaderActivityGrid(dgvRes, dgvIs);
+			LoadBooksToGrid();
+		}
+		catch (Exception^ ex) {
+			MessageBox::Show(
+				AppSettings::Translate(L"Bekor qilishda xatolik: ", L"Cancel failed: ", L"Не удалось отменить: ") + ex->Message,
+				AppSettings::Translate(L"Xatolik", L"Error", L"Ошибка"),
+				MessageBoxButtons::OK,
+				MessageBoxIcon::Error
+			);
+		}
+	}
+
 	private: System::Void ShowReaderDashboard() {
+		// Kabinetni ochishdan oldin akkaunt statusini server bilan moslashtiramiz
+		// (admin sizni endi tasdiqlagan bo'lishi mumkin yoki bloklagan bo'lishi mumkin).
+		RefreshReaderStatus();
+		if (String::IsNullOrWhiteSpace(currentReaderToken)) return;
+
 		Form^ dash = gcnew Form();
 		dash->Text = AppSettings::Translate(L"Reader Dashboard", L"Reader Dashboard", L"Кабинет читателя");
 		dash->Size = System::Drawing::Size(860, 560);
 		dash->StartPosition = FormStartPosition::CenterParent;
-		dash->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedDialog;
-		dash->MaximizeBox = false;
-		dash->MinimizeBox = false;
+		dash->FormBorderStyle = System::Windows::Forms::FormBorderStyle::Sizable;
+		dash->MinimumSize = System::Drawing::Size(720, 520);
 
-		Color panelBg = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(34, 39, 45) : System::Drawing::Color::White;
+		Color panelBg = AppSettings::SurfaceColor();
 		Color textMuted = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(170, 176, 180) : System::Drawing::Color::FromArgb(108, 117, 125);
+		Color textColor = AppSettings::TextColor();
 
 		TabControl^ tabs = gcnew TabControl();
 		tabs->Dock = DockStyle::Fill;
+		tabs->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 10.0F);
+		tabs->Padding = System::Drawing::Point(14, 6);
 
-		TabPage^ profileTab = gcnew TabPage(AppSettings::Translate(L"Profil", L"Profile", L"Профиль"));
-		TabPage^ activityTab = gcnew TabPage(AppSettings::Translate(L"Faollik", L"Activity", L"Активность"));
+		TabPage^ profileTab = gcnew TabPage(AppSettings::Translate(L"👤 Profil", L"👤 Profile", L"👤 Профиль"));
+		TabPage^ activityTab = gcnew TabPage(AppSettings::Translate(L"📊 Faollik", L"📊 Activity", L"📊 Активность"));
 
 		Panel^ profileCard = gcnew Panel();
 		profileCard->Location = Point(18, 18);
-		profileCard->Size = System::Drawing::Size(790, 180);
+		profileCard->Size = System::Drawing::Size(790, 168);
 		profileCard->BackColor = panelBg;
-		MakeRounded(profileCard, 12);
+		MakeRounded(profileCard, 14);
+
+		// Avatar — ism harfini ko'rsatuvchi dumaloq
+		Panel^ avatar = gcnew Panel();
+		avatar->Size = System::Drawing::Size(72, 72);
+		avatar->Location = Point(22, 22);
+		avatar->BackColor = System::Drawing::Color::FromArgb(99, 102, 241);
+		MakeRounded(avatar, 36);
+
+		Label^ lblAvatarText = gcnew Label();
+		String^ initial = !String::IsNullOrEmpty(currentReaderName)
+			? currentReaderName->Substring(0, 1)->ToUpper()
+			: L"?";
+		lblAvatarText->Text = initial;
+		lblAvatarText->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 24.0F, FontStyle::Bold);
+		lblAvatarText->ForeColor = System::Drawing::Color::White;
+		lblAvatarText->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
+		lblAvatarText->Dock = DockStyle::Fill;
+		avatar->Controls->Add(lblAvatarText);
 
 		Label^ lblWelcome = gcnew Label();
-		lblWelcome->Text = AppSettings::Translate(L"Xush kelibsiz", L"Welcome", L"Добро пожаловать") + L", " + currentReaderName;
-		lblWelcome->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 14.0F, System::Drawing::FontStyle::Bold);
+		lblWelcome->Text = currentReaderName;
+		lblWelcome->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 16.0F, FontStyle::Bold);
+		lblWelcome->ForeColor = textColor;
 		lblWelcome->AutoSize = true;
-		lblWelcome->Location = Point(20, 18);
+		lblWelcome->Location = Point(110, 24);
+
+		Label^ lblWelcomeSub = gcnew Label();
+		lblWelcomeSub->Text = AppSettings::Translate(L"Xush kelibsiz!", L"Welcome back!", L"Добро пожаловать!");
+		lblWelcomeSub->Font = gcnew System::Drawing::Font(L"Segoe UI", 9.5F);
+		lblWelcomeSub->ForeColor = textMuted;
+		lblWelcomeSub->AutoSize = true;
+		lblWelcomeSub->Location = Point(110, 54);
 
 		Label^ lblCard = gcnew Label();
-		lblCard->Text = AppSettings::Translate(L"Karta ID", L"Card ID", L"ID карты") + L": " + currentReaderCardId;
+		lblCard->Text = L"🪪  " + AppSettings::Translate(L"Karta ID", L"Card ID", L"ID карты") + L": " + currentReaderCardId;
 		lblCard->ForeColor = textMuted;
+		lblCard->Font = gcnew System::Drawing::Font(L"Segoe UI", 10.0F);
 		lblCard->AutoSize = true;
-		lblCard->Location = Point(22, 62);
+		lblCard->Location = Point(110, 86);
+
+		// Status pill — yumaloq tabletka shaklida
+		Panel^ statusPill = gcnew Panel();
+		statusPill->Size = System::Drawing::Size(currentReaderApproved ? 168 : 200, 30);
+		statusPill->Location = Point(110, 116);
+		statusPill->BackColor = currentReaderApproved
+			? System::Drawing::Color::FromArgb(46, 204, 113)
+			: System::Drawing::Color::FromArgb(243, 156, 18);
+		MakeRounded(statusPill, 15);
 
 		Label^ lblStatus = gcnew Label();
 		lblStatus->Text = currentReaderApproved
-			? AppSettings::Translate(L"Status: Tasdiqlangan", L"Status: Approved", L"Статус: Одобрено")
-			: AppSettings::Translate(L"Status: Admin tasdig'i kutilmoqda", L"Status: Waiting for admin approval", L"Статус: Ожидает одобрения администратора");
-		lblStatus->AutoSize = true;
-		lblStatus->Location = Point(22, 90);
-		lblStatus->ForeColor = currentReaderApproved
-			? System::Drawing::Color::FromArgb(46, 204, 113)
-			: System::Drawing::Color::FromArgb(240, 156, 0);
+			? AppSettings::Translate(L"✓ Tasdiqlangan", L"✓ Approved", L"✓ Одобрено")
+			: AppSettings::Translate(L"⏳ Tasdiq kutilmoqda", L"⏳ Pending approval", L"⏳ Ожидает одобрения");
+		lblStatus->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 9.5F, System::Drawing::FontStyle::Bold);
+		lblStatus->ForeColor = System::Drawing::Color::White;
+		lblStatus->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
+		lblStatus->Dock = DockStyle::Fill;
+		statusPill->Controls->Add(lblStatus);
 
 		Button^ btnLogout = gcnew Button();
 		btnLogout->Text = AppSettings::Translate(L"Chiqish", L"Logout", L"Выйти");
 		btnLogout->Size = System::Drawing::Size(120, 36);
-		btnLogout->Location = Point(650, 126);
+		btnLogout->Location = Point(650, 118);
 		btnLogout->FlatStyle = FlatStyle::Flat;
 		btnLogout->FlatAppearance->BorderSize = 0;
 		btnLogout->BackColor = System::Drawing::Color::FromArgb(220, 53, 69);
 		btnLogout->ForeColor = System::Drawing::Color::White;
+		btnLogout->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 10.0F, System::Drawing::FontStyle::Bold);
+		btnLogout->Cursor = System::Windows::Forms::Cursors::Hand;
 		btnLogout->Click += gcnew EventHandler(this, &MyForm::btnReaderLogout_Click);
+		MakeRounded(btnLogout, 8);
 
+		Button^ btnEditProfile = gcnew Button();
+		btnEditProfile->Text = AppSettings::Translate(L"Tahrirlash", L"Edit", L"Изменить");
+		btnEditProfile->Size = System::Drawing::Size(120, 36);
+		btnEditProfile->Location = Point(520, 118);
+		btnEditProfile->FlatStyle = FlatStyle::Flat;
+		btnEditProfile->FlatAppearance->BorderSize = 0;
+		btnEditProfile->BackColor = AppSettings::PrimaryColor();
+		btnEditProfile->ForeColor = System::Drawing::Color::White;
+		btnEditProfile->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 10.0F, System::Drawing::FontStyle::Bold);
+		btnEditProfile->Cursor = System::Windows::Forms::Cursors::Hand;
+		btnEditProfile->Click += gcnew EventHandler(this, &MyForm::btnEditProfile_Click);
+		MakeRounded(btnEditProfile, 8);
+
+		profileCard->Controls->Add(avatar);
 		profileCard->Controls->Add(lblWelcome);
+		profileCard->Controls->Add(lblWelcomeSub);
 		profileCard->Controls->Add(lblCard);
-		profileCard->Controls->Add(lblStatus);
+		profileCard->Controls->Add(statusPill);
+		profileCard->Controls->Add(btnEditProfile);
 		profileCard->Controls->Add(btnLogout);
 		profileTab->Controls->Add(profileCard);
 
 		Label^ lblCards = gcnew Label();
-		lblCards->Text = AppSettings::Translate(L"Kutubxona kartalari", L"Library cards", L"Карты библиотек");
+		lblCards->Text = AppSettings::Translate(L"📚 Kutubxona kartalari", L"📚 Library cards", L"📚 Карты библиотек");
 		lblCards->AutoSize = true;
-		lblCards->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 11.0F, FontStyle::Bold);
-		lblCards->Location = Point(18, 214);
+		lblCards->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 11.5F, System::Drawing::FontStyle::Bold);
+		lblCards->ForeColor = textColor;
+		lblCards->Location = Point(18, 204);
 
 		Button^ btnUploadCard = gcnew Button();
-		btnUploadCard->Text = AppSettings::Translate(L"Karta yuklash / yangilash", L"Upload / update card", L"Загрузить / обновить карту");
-		btnUploadCard->Size = System::Drawing::Size(220, 34);
-		btnUploadCard->Location = Point(588, 208);
+		btnUploadCard->Text = AppSettings::Translate(L"+ Karta yuklash / yangilash", L"+ Upload / update card", L"+ Загрузить / обновить карту");
+		btnUploadCard->Size = System::Drawing::Size(240, 34);
+		btnUploadCard->Location = Point(568, 198);
 		btnUploadCard->FlatStyle = FlatStyle::Flat;
 		btnUploadCard->FlatAppearance->BorderSize = 0;
 		btnUploadCard->BackColor = System::Drawing::Color::FromArgb(13, 110, 253);
 		btnUploadCard->ForeColor = System::Drawing::Color::White;
+		btnUploadCard->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 9.5F, FontStyle::Bold);
+		btnUploadCard->Cursor = System::Windows::Forms::Cursors::Hand;
 		btnUploadCard->Click += gcnew EventHandler(this, &MyForm::btnUploadLibraryCard_Click);
+		MakeRounded(btnUploadCard, 8);
 
 		DataGridView^ dgvCards = gcnew DataGridView();
-		dgvCards->Location = Point(18, 246);
-		dgvCards->Size = System::Drawing::Size(790, 250);
+		dgvCards->Location = Point(18, 240);
+		dgvCards->Size = System::Drawing::Size(790, 240);
 		dgvCards->AllowUserToAddRows = false;
 		dgvCards->ReadOnly = true;
 		dgvCards->RowHeadersVisible = false;
@@ -1809,6 +2010,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		dgvCards->ColumnCount = 2;
 		dgvCards->Columns[0]->Name = AppSettings::Translate(L"Kutubxona", L"Library", L"Библиотека");
 		dgvCards->Columns[1]->Name = AppSettings::Translate(L"Yangilangan vaqti", L"Updated at", L"Обновлено");
+		AppSettings::StyleGrid(dgvCards);
 
 		btnUploadCard->Tag = dgvCards;
 
@@ -1817,33 +2019,52 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		profileTab->Controls->Add(dgvCards);
 
 		Label^ lblRes = gcnew Label();
-		lblRes->Text = AppSettings::Translate(L"Mening bronlarim", L"My reservations", L"Мои брони");
+		lblRes->Text = AppSettings::Translate(L"📌 Mening bronlarim", L"📌 My reservations", L"📌 Мои брони");
 		lblRes->AutoSize = true;
-		lblRes->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 11.0F, FontStyle::Bold);
+		lblRes->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 11.5F, FontStyle::Bold);
+		lblRes->ForeColor = textColor;
 		lblRes->Location = Point(18, 14);
 
 		DataGridView^ dgvReservations = gcnew DataGridView();
-		dgvReservations->Location = Point(18, 38);
-		dgvReservations->Size = System::Drawing::Size(790, 180);
+		dgvReservations->Location = Point(18, 42);
+		dgvReservations->Size = System::Drawing::Size(790, 146);
 		dgvReservations->AllowUserToAddRows = false;
 		dgvReservations->ReadOnly = true;
 		dgvReservations->RowHeadersVisible = false;
+		dgvReservations->SelectionMode = DataGridViewSelectionMode::FullRowSelect;
 		dgvReservations->AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode::Fill;
-		dgvReservations->ColumnCount = 4;
+		dgvReservations->ColumnCount = 5;
 		dgvReservations->Columns[0]->Name = AppSettings::Translate(L"Kitob", L"Book", L"Книга");
 		dgvReservations->Columns[1]->Name = AppSettings::Translate(L"Band qilingan sana", L"Reserved at", L"Дата брони");
 		dgvReservations->Columns[2]->Name = AppSettings::Translate(L"Izoh", L"Note", L"Примечание");
 		dgvReservations->Columns[3]->Name = AppSettings::Translate(L"Holat", L"Status", L"Статус");
+		dgvReservations->Columns[4]->Name = L"_id";
+		dgvReservations->Columns[4]->Visible = false;
+		AppSettings::StyleGrid(dgvReservations);
+
+		Button^ btnCancelRes = gcnew Button();
+		btnCancelRes->Text = AppSettings::Translate(L"✖ Tanlangan bronni bekor qilish", L"✖ Cancel selected reservation", L"✖ Отменить выбранную бронь");
+		btnCancelRes->Size = System::Drawing::Size(280, 34);
+		btnCancelRes->Location = Point(18, 196);
+		btnCancelRes->FlatStyle = FlatStyle::Flat;
+		btnCancelRes->FlatAppearance->BorderSize = 0;
+		btnCancelRes->BackColor = System::Drawing::Color::FromArgb(220, 53, 69);
+		btnCancelRes->ForeColor = System::Drawing::Color::White;
+		btnCancelRes->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 9.5F, FontStyle::Bold);
+		btnCancelRes->Cursor = System::Windows::Forms::Cursors::Hand;
+		btnCancelRes->Click += gcnew System::EventHandler(this, &MyForm::btnCancelReservation_Click);
+		MakeRounded(btnCancelRes, 8);
 
 		Label^ lblIssued = gcnew Label();
-		lblIssued->Text = AppSettings::Translate(L"Menda olingan kitoblar", L"My borrowed books", L"Мои выданные книги");
+		lblIssued->Text = AppSettings::Translate(L"📖 Menda olingan kitoblar", L"📖 My borrowed books", L"📖 Мои выданные книги");
 		lblIssued->AutoSize = true;
-		lblIssued->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 11.0F, FontStyle::Bold);
-		lblIssued->Location = Point(18, 232);
+		lblIssued->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 11.5F, FontStyle::Bold);
+		lblIssued->ForeColor = textColor;
+		lblIssued->Location = Point(18, 244);
 
 		DataGridView^ dgvMyIssues = gcnew DataGridView();
-		dgvMyIssues->Location = Point(18, 256);
-		dgvMyIssues->Size = System::Drawing::Size(790, 190);
+		dgvMyIssues->Location = Point(18, 272);
+		dgvMyIssues->Size = System::Drawing::Size(790, 174);
 		dgvMyIssues->AllowUserToAddRows = false;
 		dgvMyIssues->ReadOnly = true;
 		dgvMyIssues->RowHeadersVisible = false;
@@ -1852,9 +2073,17 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		dgvMyIssues->Columns[0]->Name = AppSettings::Translate(L"Kitob", L"Book", L"Книга");
 		dgvMyIssues->Columns[1]->Name = AppSettings::Translate(L"Olingan sana", L"Issue date", L"Дата выдачи");
 		dgvMyIssues->Columns[2]->Name = AppSettings::Translate(L"Qaytarish muddati", L"Return date", L"Срок возврата");
+		AppSettings::StyleGrid(dgvMyIssues);
+
+		// Cancel tugmasiga gridlarning ikkalasini ham bog'laymiz
+		array<Object^>^ cancelTag = gcnew array<Object^>(2);
+		cancelTag[0] = dgvReservations;
+		cancelTag[1] = dgvMyIssues;
+		btnCancelRes->Tag = cancelTag;
 
 		activityTab->Controls->Add(lblRes);
 		activityTab->Controls->Add(dgvReservations);
+		activityTab->Controls->Add(btnCancelRes);
 		activityTab->Controls->Add(lblIssued);
 		activityTab->Controls->Add(dgvMyIssues);
 
@@ -1877,6 +2106,116 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		}
 	}
 
+	private: System::Void btnEditProfile_Click(System::Object^ sender, System::EventArgs^ e) {
+		Form^ dlg = gcnew Form();
+		dlg->Text = AppSettings::Translate(L"Profilni tahrirlash", L"Edit Profile", L"Редактировать профиль");
+		dlg->Size = System::Drawing::Size(400, 350);
+		dlg->StartPosition = FormStartPosition::CenterParent;
+		dlg->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedDialog;
+		dlg->MaximizeBox = false;
+		dlg->MinimizeBox = false;
+
+		int top = 20, left = 20, w = 340;
+
+		Label^ lblName = gcnew Label();
+		lblName->Text = AppSettings::Translate(L"F.I.Sh", L"Full Name", L"ФИО");
+		lblName->Location = Point(left, top);
+		lblName->AutoSize = true;
+		top += 22;
+
+		TextBox^ txtName = gcnew TextBox();
+		txtName->Text = currentReaderName;
+		txtName->Location = Point(left, top);
+		txtName->Size = System::Drawing::Size(w, 28);
+		top += 38;
+
+		Label^ lblPhone = gcnew Label();
+		lblPhone->Text = AppSettings::Translate(L"Telefon", L"Phone", L"Телефон");
+		lblPhone->Location = Point(left, top);
+		lblPhone->AutoSize = true;
+		top += 22;
+
+		TextBox^ txtPhone = gcnew TextBox();
+		txtPhone->Text = currentReaderPhone;
+		txtPhone->Location = Point(left, top);
+		txtPhone->Size = System::Drawing::Size(w, 28);
+		top += 38;
+
+		Label^ lblPass = gcnew Label();
+		lblPass->Text = AppSettings::Translate(L"Yangi parol (ixtiyoriy)", L"New Password (optional)", L"Новый пароль (необязательно)");
+		lblPass->Location = Point(left, top);
+		lblPass->AutoSize = true;
+		top += 22;
+
+		TextBox^ txtPass = gcnew TextBox();
+		txtPass->PasswordChar = '*';
+		txtPass->Location = Point(left, top);
+		txtPass->Size = System::Drawing::Size(w, 28);
+		top += 50;
+
+		Button^ btnSave = gcnew Button();
+		btnSave->Text = AppSettings::Translate(L"Saqlash", L"Save", L"Сохранить");
+		btnSave->Location = Point(left + w - 100, top);
+		btnSave->Size = System::Drawing::Size(100, 32);
+		btnSave->DialogResult = System::Windows::Forms::DialogResult::OK;
+
+		Button^ btnCancel = gcnew Button();
+		btnCancel->Text = AppSettings::Translate(L"Bekor", L"Cancel", L"Отмена");
+		btnCancel->Location = Point(left + w - 210, top);
+		btnCancel->Size = System::Drawing::Size(100, 32);
+		btnCancel->DialogResult = System::Windows::Forms::DialogResult::Cancel;
+
+		dlg->Controls->Add(lblName); dlg->Controls->Add(txtName);
+		dlg->Controls->Add(lblPhone); dlg->Controls->Add(txtPhone);
+		dlg->Controls->Add(lblPass); dlg->Controls->Add(txtPass);
+		dlg->Controls->Add(btnSave); dlg->Controls->Add(btnCancel);
+		dlg->AcceptButton = btnSave;
+		dlg->CancelButton = btnCancel;
+		AppSettings::ApplyTheme(dlg);
+
+		if (dlg->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+			try {
+				WebClient^ cl = gcnew WebClient();
+				cl->Encoding = System::Text::Encoding::UTF8;
+				cl->Headers[HttpRequestHeader::ContentType] = "application/json";
+				cl->Headers->Add("Authorization", "Bearer " + currentReaderToken);
+				cl->Headers->Add("X-Reader-Token", currentReaderToken);
+
+				String^ payload = String::Format("{{\"fullname\":\"{0}\",\"phone\":\"{1}\"", 
+					EscapeJson(txtName->Text), EscapeJson(txtPhone->Text));
+				
+				if (!String::IsNullOrWhiteSpace(txtPass->Text)) {
+					payload += String::Format(",\"password\":\"{0}\"", EscapeJson(txtPass->Text));
+				}
+				payload += "}";
+
+				String^ resp = cl->UploadString(apiUrl + "readers/update-me/", "PUT", payload);
+				
+				// Update locals
+				currentReaderName = txtName->Text;
+				currentReaderPhone = txtPhone->Text;
+
+				MessageBox::Show(
+					AppSettings::Translate(L"Profil saqlandi! O'zgarishlar oynani qayta ochganda to'liq ko'rinadi.", L"Profile saved!", L"Профиль сохранен!"),
+					AppSettings::Translate(L"Muvaffaqiyat", L"Success", L"Успешно"),
+					MessageBoxButtons::OK, MessageBoxIcon::Information
+				);
+				
+				// Oynani yopib qayta ochamiz (to update UI)
+				Form^ dash = btnSave->FindForm();
+				if (dash != nullptr) {
+					dash->DialogResult = System::Windows::Forms::DialogResult::OK;
+				}
+			} catch (Exception^ ex) {
+				MessageBox::Show(
+					AppSettings::Translate(L"Xatolik: ", L"Error: ", L"Ошибка: ") + ex->Message,
+					AppSettings::Translate(L"Xatolik", L"Error", L"Ошибка"),
+					MessageBoxButtons::OK, MessageBoxIcon::Error
+				);
+			}
+		}
+	}
+
 	private: bool EnsureReaderCanReserve() {
 		if (String::IsNullOrWhiteSpace(currentReaderToken) || currentReaderId <= 0) {
 			MessageBox::Show(
@@ -1887,18 +2226,93 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			);
 			return false;
 		}
-
-		if (!currentReaderApproved) {
-			MessageBox::Show(
-				AppSettings::Translate(L"Akkauntingiz admin tasdig'idan o'tmagan.", L"Your account is awaiting admin approval.", L"Ваш аккаунт ожидает одобрения администратора."),
-				AppSettings::Translate(L"Tasdiq kutilmoqda", L"Approval pending", L"Ожидается одобрение"),
-				MessageBoxButtons::OK,
-				MessageBoxIcon::Warning
-			);
-			return false;
-		}
-
+		// Foydalanuvchi admin tasdig'idan o'tmasdan ham band qila oladi.
+		// Faqat login bo'lishi kerak.
 		return true;
+	}
+
+	private: System::Void btnRateBook_Click(System::Object^ sender, System::EventArgs^ e) {
+		Button^ btn = dynamic_cast<Button^>(sender);
+		if (btn == nullptr || btn->Tag == nullptr) return;
+		array<Object^>^ res = dynamic_cast<array<Object^>^>(btn->Tag);
+		if (res == nullptr || res->Length < 13) return;
+		if (!EnsureReaderCanReserve()) return;
+
+		String^ bookIdText = res[12] != nullptr ? res[12]->ToString() : L"";
+		if (String::IsNullOrWhiteSpace(bookIdText)) return;
+
+		Form^ dlg = gcnew Form();
+		dlg->Text = AppSettings::Translate(L"Kitobni baholash", L"Rate the book", L"Оценить книгу");
+		dlg->Size = System::Drawing::Size(420, 280);
+		dlg->StartPosition = FormStartPosition::CenterParent;
+		dlg->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedDialog;
+		dlg->MaximizeBox = false;
+		dlg->MinimizeBox = false;
+
+		Label^ lbl = gcnew Label();
+		lbl->Text = AppSettings::Translate(L"Reyting (1-5):", L"Rating (1-5):", L"Рейтинг (1-5):");
+		lbl->Location = Point(20, 20);
+		lbl->AutoSize = true;
+
+		NumericUpDown^ num = gcnew NumericUpDown();
+		num->Location = Point(20, 44);
+		num->Size = System::Drawing::Size(80, 26);
+		num->Minimum = 1; num->Maximum = 5; num->Value = 5;
+
+		Label^ lbl2 = gcnew Label();
+		lbl2->Text = AppSettings::Translate(L"Sharh (ixtiyoriy):", L"Review (optional):", L"Отзыв (необязательно):");
+		lbl2->Location = Point(20, 80);
+		lbl2->AutoSize = true;
+
+		TextBox^ txtReview = gcnew TextBox();
+		txtReview->Location = Point(20, 104);
+		txtReview->Size = System::Drawing::Size(360, 70);
+		txtReview->Multiline = true;
+
+		Button^ ok = gcnew Button();
+		ok->Text = AppSettings::Translate(L"Saqlash", L"Save", L"Сохранить");
+		ok->Location = Point(280, 188);
+		ok->Size = System::Drawing::Size(100, 32);
+		ok->DialogResult = System::Windows::Forms::DialogResult::OK;
+
+		Button^ cancel = gcnew Button();
+		cancel->Text = AppSettings::Translate(L"Bekor", L"Cancel", L"Отмена");
+		cancel->Location = Point(170, 188);
+		cancel->Size = System::Drawing::Size(100, 32);
+		cancel->DialogResult = System::Windows::Forms::DialogResult::Cancel;
+
+		dlg->Controls->Add(lbl); dlg->Controls->Add(num);
+		dlg->Controls->Add(lbl2); dlg->Controls->Add(txtReview);
+		dlg->Controls->Add(ok); dlg->Controls->Add(cancel);
+		dlg->AcceptButton = ok; dlg->CancelButton = cancel;
+		AppSettings::ApplyTheme(dlg);
+
+		if (dlg->ShowDialog() != System::Windows::Forms::DialogResult::OK) return;
+
+		try {
+			WebClient^ cl = gcnew WebClient();
+			cl->Encoding = System::Text::Encoding::UTF8;
+			cl->Headers[HttpRequestHeader::ContentType] = "application/json";
+			cl->Headers->Add("Authorization", "Bearer " + currentReaderToken);
+			cl->Headers->Add("X-Reader-Token", currentReaderToken);
+			String^ payload = String::Format("{{\"rating\":{0},\"review\":\"{1}\"}}",
+				(int)num->Value, EscapeJson(txtReview->Text));
+			cl->UploadString(apiUrl + "books/" + bookIdText + "/rate/", "POST", payload);
+			MessageBox::Show(
+				AppSettings::Translate(L"Rahmat! Reytingingiz saqlandi.", L"Thanks! Your rating is saved.", L"Спасибо! Ваша оценка сохранена."),
+				AppSettings::Translate(L"Tayyor", L"Done", L"Готово"),
+				MessageBoxButtons::OK,
+				MessageBoxIcon::Information
+			);
+		}
+		catch (Exception^ ex) {
+			MessageBox::Show(
+				AppSettings::Translate(L"Baholashda xatolik: ", L"Rating error: ", L"Ошибка оценки: ") + ex->Message,
+				AppSettings::Translate(L"Xatolik", L"Error", L"Ошибка"),
+				MessageBoxButtons::OK,
+				MessageBoxIcon::Error
+			);
+		}
 	}
 
 	private: System::Void btnReserve_Click(System::Object^ sender, System::EventArgs^ e) {
@@ -1914,25 +2328,65 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			return;
 		}
 
+		// library ID ni res[13] dan olish (mavjud bo'lsa)
+		String^ libraryIdText = (res->Length > 13 && res[13] != nullptr) ? res[13]->ToString() : L"";
+
 		try {
 			int bookId = Int32::Parse(bookIdText);
 			String^ libraryName = res[2] != nullptr ? res[2]->ToString() : L"";
 
 			String^ libraryCardB64 = L"";
-			System::Windows::Forms::DialogResult uploadChoice = MessageBox::Show(
-				AppSettings::Translate(
-					L"Agar ushbu kutubxona uchun kartangiz avval yuklanmagan bo'lsa, ruxsatnoma rasmini yuklang. Hozir yuklaysizmi?",
-					L"If your card for this library is not uploaded yet, upload permit image now. Upload now?",
-					L"Если карта для этой библиотеки еще не загружена, загрузите изображение сейчас. Загрузить?"
-				) + L"\n\n" + AppSettings::Translate(L"Kutubxona", L"Library", L"Библиотека") + L": " + libraryName,
-				AppSettings::Translate(L"Kutubxona kartasi", L"Library card", L"Карта библиотеки"),
-				MessageBoxButtons::YesNoCancel,
-				MessageBoxIcon::Question
-			);
+			bool cardApproved = false;
 
-			if (uploadChoice == System::Windows::Forms::DialogResult::Cancel) return;
+			// Avval serverdan bu kutubxona uchun karta holatini tekshiramiz
+			if (!String::IsNullOrWhiteSpace(libraryIdText) && !String::IsNullOrWhiteSpace(currentReaderToken)) {
+				try {
+					WebClient^ checkCl = gcnew WebClient();
+					checkCl->Encoding = System::Text::Encoding::UTF8;
+					checkCl->Headers->Add("X-Reader-Token", currentReaderToken);
+					checkCl->Headers->Add("Authorization", "Bearer " + currentReaderToken);
+					String^ cardStatusJson = checkCl->DownloadString(
+						apiUrl + "readers/check-library-card/?library=" + libraryIdText
+					);
+					// has_card va is_approved ni JSON dan olish
+					bool hasCard = cardStatusJson->Contains("\"has_card\": true") || cardStatusJson->Contains("\"has_card\":true");
+					cardApproved = cardStatusJson->Contains("\"is_approved\": true") || cardStatusJson->Contains("\"is_approved\":true");
 
-			if (uploadChoice == System::Windows::Forms::DialogResult::Yes) {
+					if (hasCard && !cardApproved) {
+						// Karta bor lekin tasdiqlanmagan
+						System::Windows::Forms::DialogResult pendingChoice = MessageBox::Show(
+							AppSettings::Translate(
+								L"Ushbu kutubxona uchun kartangiz admin tasdig'ini kutmoqda.\nYangi karta rasmi yuklaysizmi?",
+								L"Your card for this library is pending admin approval.\nUpload a new card image?",
+								L"Ваша карта для этой библиотеки ожидает подтверждения.\nЗагрузить новое изображение?"
+							) + L"\n\n" + AppSettings::Translate(L"Kutubxona", L"Library", L"Библиотека") + ": " + libraryName,
+							AppSettings::Translate(L"Kutubxona kartasi", L"Library card", L"Карта библиотеки"),
+							MessageBoxButtons::YesNo,
+							MessageBoxIcon::Warning
+						);
+						if (pendingChoice == System::Windows::Forms::DialogResult::No) return;
+						// Yangi rasm yuklashga o'tamiz
+					}
+				} catch (...) {
+					// Tekshirishda xatolik bo'lsa davom etamiz
+				}
+			}
+
+			if (!cardApproved) {
+				// Karta yo'q yoki tasdiqlanmagan — rasm so'rash
+				System::Windows::Forms::DialogResult uploadChoice = MessageBox::Show(
+					AppSettings::Translate(
+						L"Ushbu kutubxona uchun kutubxona kartangizni yuklang (ruxsatnoma rasmi).",
+						L"Please upload your library card image for this library.",
+						L"Загрузите изображение вашей карты для этой библиотеки."
+					) + L"\n\n" + AppSettings::Translate(L"Kutubxona", L"Library", L"Библиотека") + ": " + libraryName,
+					AppSettings::Translate(L"Kutubxona kartasi kerak", L"Library card required", L"Требуется карта библиотеки"),
+					MessageBoxButtons::OKCancel,
+					MessageBoxIcon::Information
+				);
+
+				if (uploadChoice == System::Windows::Forms::DialogResult::Cancel) return;
+
 				OpenFileDialog^ ofd = gcnew OpenFileDialog();
 				ofd->Filter = L"Rasm fayllari|*.jpg;*.jpeg;*.png;*.bmp";
 				if (ofd->ShowDialog() != System::Windows::Forms::DialogResult::OK) return;
@@ -1941,6 +2395,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				array<Byte>^ cardBytes = File::ReadAllBytes(ofd->FileName);
 				libraryCardB64 = Convert::ToBase64String(cardBytes);
 			}
+			// cardApproved == true bo'lsa libraryCardB64 bo'sh qoladi — server uni talab qilmaydi
 
 			WebClient^ client = gcnew WebClient();
 			client->Encoding = System::Text::Encoding::UTF8;
@@ -2014,6 +2469,8 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				AdminForm^ adminForm = gcnew AdminForm();
 				AppSettings::ApplyTheme(adminForm);
 				adminForm->ShowDialog();
+				// Admin reader holatini o'zgartirgan bo'lishi mumkin — bosh sahifaga uyg'un.
+				RefreshReaderStatus();
 				LoadDataFilters();
 				LoadBooksToGrid();
 				if (this->marqueeTimer != nullptr) this->marqueeTimer->Stop();
@@ -2175,9 +2632,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				}
 				LoginReader(txtCardL->Text->Trim(), txtPasswordL->Text);
 				MessageBox::Show(
-					currentReaderApproved
-						? AppSettings::Translate(L"Kirish muvaffaqiyatli.", L"Login successful.", L"Вход выполнен.")
-						: AppSettings::Translate(L"Kirish muvaffaqiyatli. Admin tasdiqlashi kutilmoqda.", L"Login successful. Awaiting admin approval.", L"Вход выполнен. Ожидается одобрение администратора."),
+					AppSettings::Translate(L"Kirish muvaffaqiyatli.", L"Login successful.", L"Вход выполнен."),
 					AppSettings::Translate(L"Muvaffaqiyat", L"Success", L"Успешно"),
 					MessageBoxButtons::OK,
 					MessageBoxIcon::Information
@@ -2192,9 +2647,9 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 
 				String^ newCardId = RegisterReader(txtName->Text->Trim(), txtPhone->Text->Trim(), txtPasswordR->Text);
 				String^ msg = AppSettings::Translate(
-					L"Ro'yxatdan o'tdingiz. Karta ID: " + newCardId + L". Endi admin tasdiqlashini kuting. Kartangizni saqlab qoling!",
-					L"Registration completed. Card ID: " + newCardId + L". Please wait for admin approval. Save your Card ID!",
-					L"Регистрация завершена. ID карты: " + newCardId + L". Дождитесь одобрения администратора. Сохраните ID карты!"
+					L"Muvaffaqiyatli ro'yxatdan o'tdingiz. Tizimga kirish uchun Karta ID: " + newCardId + L". Buni saqlab qoling!",
+					L"Registration successful. Your Login Card ID is: " + newCardId + L". Please save it!",
+					L"Регистрация прошла успешно. Ваш ID карты для входа: " + newCardId + L". Пожалуйста, сохраните его!"
 				);
 				MessageBox::Show(
 					msg,
@@ -2238,6 +2693,247 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		HistoryForm^ hF = gcnew HistoryForm();
 		AppSettings::ApplyTheme(hF);
 		hF->ShowDialog();
+	}
+
+	// Top kitoblar dialogini ochadi: 3 tab — eng ommabop, eng yuqori reytingdagi, eng ko'p o'qilgan.
+	// Har bir tab kartalar ko'rinishida (FlowLayoutPanel) — bosh sahifaga uyg'un.
+	private: System::Void btnTopBooks_Click(System::Object^ sender, System::EventArgs^ e) {
+		Form^ dlg = gcnew Form();
+		dlg->Text = AppSettings::Translate(L"Eng yaxshi kitoblar", L"Top books", L"Лучшие книги");
+		dlg->Size = System::Drawing::Size(900, 620);
+		dlg->StartPosition = FormStartPosition::CenterParent;
+		dlg->FormBorderStyle = System::Windows::Forms::FormBorderStyle::Sizable;
+		dlg->MinimumSize = System::Drawing::Size(720, 520);
+
+		TabControl^ tabs = gcnew TabControl();
+		tabs->Dock = DockStyle::Fill;
+		tabs->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 10.0F);
+		tabs->Padding = System::Drawing::Point(14, 6);
+
+		TabPage^ tabPopular = gcnew TabPage(AppSettings::Translate(L"🔥 Eng ommabop", L"🔥 Most popular", L"🔥 Популярные"));
+		TabPage^ tabRated   = gcnew TabPage(AppSettings::Translate(L"★ Yuqori reyting", L"★ Top rated", L"★ Высокий рейтинг"));
+		TabPage^ tabRead    = gcnew TabPage(AppSettings::Translate(L"📚 Eng ko'p o'qilgan", L"📚 Most read", L"📚 Чаще всего читают"));
+
+		FlowLayoutPanel^ flpPop   = BuildTopBooksFlow();
+		FlowLayoutPanel^ flpRated = BuildTopBooksFlow();
+		FlowLayoutPanel^ flpRead  = BuildTopBooksFlow();
+
+		tabPopular->Controls->Add(flpPop);
+		tabRated->Controls->Add(flpRated);
+		tabRead->Controls->Add(flpRead);
+
+		tabs->TabPages->Add(tabPopular);
+		tabs->TabPages->Add(tabRated);
+		tabs->TabPages->Add(tabRead);
+		dlg->Controls->Add(tabs);
+
+		LoadTopBooksFlow(flpPop,   L"popular");
+		LoadTopBooksFlow(flpRated, L"top-rated");
+		LoadTopBooksFlow(flpRead,  L"most-read");
+
+		AppSettings::ApplyTheme(dlg);
+		dlg->ShowDialog();
+	}
+
+	private: FlowLayoutPanel^ BuildTopBooksFlow() {
+		FlowLayoutPanel^ flp = gcnew FlowLayoutPanel();
+		flp->Dock = DockStyle::Fill;
+		flp->AutoScroll = true;
+		flp->FlowDirection = System::Windows::Forms::FlowDirection::TopDown;
+		flp->WrapContents = false;
+		flp->Padding = System::Windows::Forms::Padding(14, 12, 14, 12);
+		return flp;
+	}
+
+	private: System::Collections::Generic::List<String^>^ ExtractJsonObjects(String^ json) {
+		System::Collections::Generic::List<String^>^ result = gcnew System::Collections::Generic::List<String^>();
+		int braceCount = 0;
+		int startIndex = -1;
+		bool inString = false;
+		for (int i = 0; i < json->Length; i++) {
+			wchar_t c = json[i];
+			if (c == L'"' && (i == 0 || json[i - 1] != L'\\')) {
+				inString = !inString;
+			}
+			if (!inString) {
+				if (c == L'{') {
+					if (braceCount == 0) startIndex = i;
+					braceCount++;
+				} else if (c == L'}') {
+					braceCount--;
+					if (braceCount == 0 && startIndex != -1) {
+						result->Add(json->Substring(startIndex, i - startIndex + 1));
+						startIndex = -1;
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	// Top kitoblar API'sidan ma'lumotni yuklab, FlowLayoutPanel ichiga karta-qatorlar qo'shadi.
+	private: System::Void LoadTopBooksFlow(FlowLayoutPanel^ flp, String^ endpoint) {
+		if (flp == nullptr) return;
+		flp->Controls->Clear();
+
+		// Yuklanish indikatori
+		Label^ lblLoading = gcnew Label();
+		lblLoading->Text = AppSettings::Translate(L"Yuklanmoqda…", L"Loading…", L"Загрузка…");
+		lblLoading->AutoSize = true;
+		lblLoading->Font = gcnew System::Drawing::Font(L"Segoe UI", 10.0F, FontStyle::Italic);
+		lblLoading->ForeColor = AppSettings::DarkMode
+			? System::Drawing::Color::FromArgb(170, 176, 180)
+			: System::Drawing::Color::FromArgb(108, 117, 125);
+		flp->Controls->Add(lblLoading);
+		flp->Refresh();
+
+		String^ json = L"";
+		try {
+			WebClient^ cl = gcnew WebClient();
+			cl->Encoding = System::Text::Encoding::UTF8;
+			json = cl->DownloadString(apiUrl + "books/" + endpoint + "/?limit=20");
+		}
+		catch (Exception^ ex) {
+			flp->Controls->Clear();
+			Label^ lblErr = gcnew Label();
+			lblErr->Text = AppSettings::Translate(L"Yuklashda xatolik: ", L"Failed to load: ", L"Ошибка загрузки: ") + ex->Message;
+			lblErr->AutoSize = true;
+			lblErr->ForeColor = System::Drawing::Color::FromArgb(220, 53, 69);
+			flp->Controls->Add(lblErr);
+			return;
+		}
+
+		flp->Controls->Clear();
+		System::Collections::Generic::List<String^>^ items = ExtractJsonObjects(json);
+
+		if (items->Count == 0) {
+			Label^ lblEmpty = gcnew Label();
+			lblEmpty->Text = AppSettings::Translate(
+				L"Bu bo'limda hali kitoblar yo'q.",
+				L"No books in this section yet.",
+				L"В этом разделе пока нет книг."
+			);
+			lblEmpty->AutoSize = true;
+			lblEmpty->Font = gcnew System::Drawing::Font(L"Segoe UI", 11.0F, FontStyle::Italic);
+			lblEmpty->ForeColor = AppSettings::DarkMode
+				? System::Drawing::Color::FromArgb(170, 176, 180)
+				: System::Drawing::Color::FromArgb(108, 117, 125);
+			flp->Controls->Add(lblEmpty);
+			return;
+		}
+
+		int rank = 1;
+		for each (String^ obj in items) {
+			String^ title = Regex::Match(obj, "\"title\":\"([^\"]*)\"")->Groups[1]->Value;
+			String^ author = Regex::Match(obj, "\"author_name\":\"([^\"]*)\"")->Groups[1]->Value;
+			String^ libName = Regex::Match(obj, "\"library_name\":\"([^\"]*)\"")->Groups[1]->Value;
+			String^ avg = Regex::Match(obj, "\"average_rating\":([\\d\\.]+)")->Groups[1]->Value;
+			String^ cnt = Regex::Match(obj, "\"ratings_count\":(\\d+)")->Groups[1]->Value;
+			String^ views = Regex::Match(obj, "\"view_count\":(\\d+)")->Groups[1]->Value;
+			String^ issues = Regex::Match(obj, "\"issue_count\":(\\d+)")->Groups[1]->Value;
+			if (String::IsNullOrEmpty(avg)) avg = L"0";
+			if (String::IsNullOrEmpty(cnt)) cnt = L"0";
+			if (String::IsNullOrEmpty(views)) views = L"0";
+			if (String::IsNullOrEmpty(issues)) issues = L"0";
+
+			Panel^ card = BuildTopBookCard(rank, title, author, libName, avg, cnt, views, issues);
+			card->Width = flp->ClientSize.Width - 36;
+			card->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left | AnchorStyles::Right);
+			flp->Controls->Add(card);
+			rank++;
+		}
+	}
+
+	// Bitta top-book kartasini quradi (rank badge + matn bloklari).
+	private: Panel^ BuildTopBookCard(int rank, String^ title, String^ author, String^ libName,
+	                                 String^ avg, String^ cnt, String^ views, String^ issues) {
+		Color cardBg = AppSettings::SurfaceColor();
+		Color textColor = AppSettings::DarkMode
+			? System::Drawing::Color::FromArgb(236, 240, 241)
+			: System::Drawing::Color::FromArgb(33, 37, 41);
+		Color mutedColor = AppSettings::DarkMode
+			? System::Drawing::Color::FromArgb(170, 176, 180)
+			: System::Drawing::Color::FromArgb(108, 117, 125);
+
+		Panel^ card = gcnew Panel();
+		card->Size = System::Drawing::Size(700, 92);
+		card->BackColor = cardBg;
+		card->Margin = System::Windows::Forms::Padding(0, 0, 0, 10);
+		card->Padding = System::Windows::Forms::Padding(0);
+		MakeRounded(card, 12);
+
+		// Rank badge — top 3 uchun oltin/kumush/bronza, qolgani uchun ko'k
+		Color badgeBg = System::Drawing::Color::FromArgb(99, 102, 241);
+		if (rank == 1) badgeBg = System::Drawing::Color::FromArgb(241, 196, 15);
+		else if (rank == 2) badgeBg = System::Drawing::Color::FromArgb(149, 165, 166);
+		else if (rank == 3) badgeBg = System::Drawing::Color::FromArgb(205, 127, 50);
+
+		Panel^ badge = gcnew Panel();
+		badge->Size = System::Drawing::Size(58, 58);
+		badge->Location = Point(16, 16);
+		badge->BackColor = badgeBg;
+		MakeRounded(badge, 29);
+
+		Label^ lblRank = gcnew Label();
+		lblRank->Text = L"#" + rank.ToString();
+		lblRank->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 14.0F, FontStyle::Bold);
+		lblRank->ForeColor = System::Drawing::Color::White;
+		lblRank->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
+		lblRank->Dock = DockStyle::Fill;
+		badge->Controls->Add(lblRank);
+
+		// Sarlavha
+		Label^ lblTitle = gcnew Label();
+		lblTitle->Text = title;
+		lblTitle->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 11.5F, FontStyle::Bold);
+		lblTitle->ForeColor = textColor;
+		lblTitle->Location = Point(94, 14);
+		lblTitle->AutoSize = false;
+		lblTitle->Size = System::Drawing::Size(420, 22);
+
+		// Muallif + kutubxona
+		Label^ lblAuthor = gcnew Label();
+		String^ subline = author;
+		if (!String::IsNullOrEmpty(libName)) {
+			subline = String::IsNullOrEmpty(author) ? libName : (author + L"  •  " + libName);
+		}
+		lblAuthor->Text = subline;
+		lblAuthor->Font = gcnew System::Drawing::Font(L"Segoe UI", 9.5F);
+		lblAuthor->ForeColor = mutedColor;
+		lblAuthor->Location = Point(94, 38);
+		lblAuthor->AutoSize = false;
+		lblAuthor->Size = System::Drawing::Size(420, 18);
+
+		// Reyting yulduzlar
+		Label^ lblStars = gcnew Label();
+		double avgD = 0; Double::TryParse(avg, System::Globalization::NumberStyles::Float,
+			System::Globalization::CultureInfo::InvariantCulture, avgD);
+		String^ stars = L"";
+		int full = (int)System::Math::Round(avgD);
+		for (int i = 0; i < 5; i++) stars += (i < full ? L"★" : L"☆");
+		lblStars->Text = stars + L"  " + avg + L"  (" + cnt + L")";
+		lblStars->Font = gcnew System::Drawing::Font(L"Segoe UI", 9.5F);
+		lblStars->ForeColor = System::Drawing::Color::FromArgb(243, 156, 18);
+		lblStars->Location = Point(94, 60);
+		lblStars->AutoSize = false;
+		lblStars->Size = System::Drawing::Size(220, 18);
+
+		// Statistika chiplari
+		Label^ lblStats = gcnew Label();
+		lblStats->Text = AppSettings::Translate(L"👁 ", L"👁 ", L"👁 ") + views
+			+ L"   " + AppSettings::Translate(L"📖 ", L"📖 ", L"📖 ") + issues;
+		lblStats->Font = gcnew System::Drawing::Font(L"Segoe UI", 9.5F);
+		lblStats->ForeColor = mutedColor;
+		lblStats->Location = Point(330, 60);
+		lblStats->AutoSize = false;
+		lblStats->Size = System::Drawing::Size(180, 18);
+
+		card->Controls->Add(badge);
+		card->Controls->Add(lblTitle);
+		card->Controls->Add(lblAuthor);
+		card->Controls->Add(lblStars);
+		card->Controls->Add(lblStats);
+		return card;
 	}
 
 	private: System::Void btnSearch_Click(System::Object^ sender, System::EventArgs^ e) {
@@ -2316,9 +3012,9 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		if (String::IsNullOrWhiteSpace(ebookPath)) {
 			MessageBox::Show(
 				AppSettings::Translate(L"Bu kitob uchun elektron fayl biriktirilmagan.", L"No electronic file is attached for this book.", L"Для этой книги не прикреплен электронный файл."),
-				AppSettings::Translate(L"Ma'lumot", L"Information", L"Информация"),
+				AppSettings::Translate(L"Ma'lumot", L"Error", L"Ошибка"),
 				MessageBoxButtons::OK,
-				MessageBoxIcon::Information
+				MessageBoxIcon::Error
 			);
 			return;
 		}

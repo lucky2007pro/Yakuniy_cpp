@@ -4,6 +4,8 @@ using namespace System;
 using namespace System::IO;
 using namespace System::Drawing;
 using namespace System::Windows::Forms;
+using namespace System::Drawing::Drawing2D;
+using namespace System::Collections::Generic;
 
 namespace Yakuniyloyiha {
 
@@ -72,6 +74,43 @@ namespace Yakuniyloyiha {
 			}
 		}
 
+		// === CREATIVE PREMIUM GRADIENT SYSTEM ===
+		static Color GradientPrimaryStart() {
+			return DarkMode ? Color::FromArgb(38, 207, 219) : Color::FromArgb(112, 170, 206);
+		}
+
+		static Color GradientPrimaryEnd() {
+			return DarkMode ? Color::FromArgb(111, 132, 255) : Color::FromArgb(60, 110, 150);
+		}
+
+		static Color GradientAccentStart() {
+			return DarkMode ? Color::FromArgb(34, 187, 211) : Color::FromArgb(73, 198, 217);
+		}
+
+		static Color GradientAccentEnd() {
+			return DarkMode ? Color::FromArgb(88, 110, 230) : Color::FromArgb(105, 130, 247);
+		}
+
+		static Color GradientWarmStart() {
+			return DarkMode ? Color::FromArgb(241, 198, 104) : Color::FromArgb(245, 212, 126);
+		}
+
+		static Color GradientWarmEnd() {
+			return DarkMode ? Color::FromArgb(240, 141, 70) : Color::FromArgb(244, 160, 84);
+		}
+
+		static Color CardHoverColor() {
+			return DarkMode ? Color::FromArgb(46, 69, 111) : Color::FromArgb(53, 71, 89);
+		}
+
+		static Color CardElevatedColor() {
+			return DarkMode ? Color::FromArgb(38, 53, 85) : Color::FromArgb(245, 245, 250);
+		}
+
+		static Color SidebarColor() {
+			return DarkMode ? Color::FromArgb(30, 166, 191) : Color::FromArgb(45, 162, 179);
+		}
+
 		static void ApplyTheme(Form^ form) {
 			if (form == nullptr) return;
 
@@ -87,60 +126,60 @@ namespace Yakuniyloyiha {
 		}
 
 		static Color PageBackColor() {
-			return DarkMode ? Color::FromArgb(10, 14, 23) : Color::FromArgb(245, 247, 251);
+			return DarkMode ? Color::FromArgb(23, 36, 61) : Color::FromArgb(112, 170, 206);
 		}
 
 		static Color SurfaceColor() {
-			return DarkMode ? Color::FromArgb(22, 30, 46) : Color::White;
+			return DarkMode ? Color::FromArgb(36, 55, 88) : Color::FromArgb(43, 61, 79);
 		}
 
 		static Color ElevatedColor() {
-			return DarkMode ? Color::FromArgb(30, 40, 59) : Color::FromArgb(232, 238, 247);
+			return DarkMode ? Color::FromArgb(44, 65, 101) : Color::FromArgb(245, 245, 250);
 		}
 
 		static Color TextColor() {
-			return DarkMode ? Color::FromArgb(248, 250, 252) : Color::FromArgb(15, 23, 42);
+			return DarkMode ? Color::FromArgb(246, 249, 255) : Color::FromArgb(20, 30, 50);
 		}
 
 		static Color MutedTextColor() {
-			return DarkMode ? Color::FromArgb(148, 163, 184) : Color::FromArgb(100, 116, 139);
+			return DarkMode ? Color::FromArgb(169, 186, 212) : Color::FromArgb(60, 80, 100);
 		}
 
 		static Color BorderColor() {
-			return DarkMode ? Color::FromArgb(49, 63, 85) : Color::FromArgb(218, 226, 238);
+			return DarkMode ? Color::FromArgb(71, 101, 142) : Color::FromArgb(45, 162, 179);
 		}
 
 		static Color PrimaryColor() {
-			return DarkMode ? Color::FromArgb(0, 242, 254) : Color::FromArgb(37, 99, 235);
+			return DarkMode ? Color::FromArgb(78, 127, 255) : Color::FromArgb(45, 162, 179);
 		}
 
 		static Color PrimaryHoverColor() {
-			return DarkMode ? Color::FromArgb(79, 172, 254) : Color::FromArgb(29, 78, 216);
+			return DarkMode ? Color::FromArgb(106, 151, 255) : Color::FromArgb(35, 142, 159);
 		}
 
 		static Color PrimaryTextColor() {
-			return DarkMode ? Color::FromArgb(5, 10, 18) : Color::White;
+			return DarkMode ? Color::FromArgb(10, 20, 40) : Color::White;
 		}
 
 		static Color SecondaryColor() {
-			return DarkMode ? Color::FromArgb(161, 140, 209) : Color::FromArgb(99, 102, 241);
+			return DarkMode ? Color::FromArgb(232, 198, 104) : Color::FromArgb(255, 180, 80);
 		}
 
 		static Color SuccessColor() {
-			return DarkMode ? Color::FromArgb(0, 230, 118) : Color::FromArgb(22, 163, 74);
+			return DarkMode ? Color::FromArgb(50, 220, 120) : Color::FromArgb(30, 180, 100);
 		}
 
 		static Color DangerColor() {
-			return DarkMode ? Color::FromArgb(255, 23, 68) : Color::FromArgb(220, 38, 38);
+			return DarkMode ? Color::FromArgb(255, 80, 100) : Color::FromArgb(220, 50, 50);
 		}
 
 		static Color WarningColor() {
-			return DarkMode ? Color::FromArgb(255, 201, 87) : Color::FromArgb(245, 158, 11);
+			return DarkMode ? Color::FromArgb(255, 200, 80) : Color::FromArgb(255, 140, 0);
 		}
 
 		static void MakeRounded(Control^ ctrl, int radius) {
 			if (ctrl == nullptr || ctrl->Width <= 0 || ctrl->Height <= 0) return;
-			System::Drawing::Drawing2D::GraphicsPath^ path = gcnew System::Drawing::Drawing2D::GraphicsPath();
+			GraphicsPath^ path = gcnew GraphicsPath();
 			path->StartFigure();
 			path->AddArc(0, 0, radius, radius, 180, 90);
 			path->AddArc(ctrl->Width - radius, 0, radius, radius, 270, 90);
@@ -158,23 +197,110 @@ namespace Yakuniyloyiha {
 			btn->ForeColor = foreColor;
 			btn->Font = gcnew Drawing::Font(L"Segoe UI Semibold", 10.0F, FontStyle::Bold);
 			btn->Cursor = Cursors::Hand;
+			btn->Height = 40;
 			MakeRounded(btn, 10);
+		}
+
+		static void StyleModernButton(Button^ btn, bool isPrimary) {
+			if (btn == nullptr) return;
+			btn->FlatStyle = FlatStyle::Flat;
+			btn->FlatAppearance->BorderSize = 0;
+			btn->Font = gcnew Drawing::Font(L"Segoe UI Semibold", 11.0F, FontStyle::Bold);
+			btn->Cursor = Cursors::Hand;
+			btn->Height = 44;
+			MakeRounded(btn, 12);
+
+			if (isPrimary) {
+				btn->BackColor = PrimaryColor();
+				btn->ForeColor = PrimaryTextColor();
+				btn->FlatAppearance->MouseOverBackColor = PrimaryHoverColor();
+			}
+			else {
+				btn->BackColor = ElevatedColor();
+				btn->ForeColor = TextColor();
+				btn->FlatAppearance->BorderSize = 2;
+				btn->FlatAppearance->BorderColor = BorderColor();
+				btn->FlatAppearance->MouseOverBackColor = CardHoverColor();
+			}
+		}
+
+		static void EnableGradientBackground(Control^ ctrl, Color start, Color end) {
+			if (ctrl == nullptr) return;
+			gradientMap[ctrl] = gcnew cli::array<Color>(2) { start, end };
+			ctrl->Paint -= gcnew PaintEventHandler(&AppSettings::PaintGradientBackground);
+			ctrl->Paint += gcnew PaintEventHandler(&AppSettings::PaintGradientBackground);
+			ctrl->Resize -= gcnew EventHandler(&AppSettings::RefreshGradientControl);
+			ctrl->Resize += gcnew EventHandler(&AppSettings::RefreshGradientControl);
+			ctrl->Invalidate();
+		}
+
+		static void StyleSurfacePanel(Panel^ panel, int radius, bool elevated) {
+			if (panel == nullptr) return;
+			panel->BackColor = elevated ? CardElevatedColor() : SurfaceColor();
+			MakeRounded(panel, radius);
+		}
+
+		static void StyleAccentStrip(Panel^ panel, Color color, int radius) {
+			if (panel == nullptr) return;
+			panel->BackColor = color;
+			MakeRounded(panel, radius);
+		}
+
+		static void StyleHeaderTitle(Label^ label) {
+			if (label == nullptr) return;
+			label->Font = gcnew Drawing::Font(L"Segoe UI Semibold", 20.0F, FontStyle::Bold);
+			label->ForeColor = Color::White;
+			label->BackColor = Color::Transparent;
+		}
+
+		static void StyleHeaderSubtitle(Label^ label) {
+			if (label == nullptr) return;
+			label->Font = gcnew Drawing::Font(L"Segoe UI", 10.2F, FontStyle::Regular);
+			label->ForeColor = Color::FromArgb(225, 240, 255);
+			label->BackColor = Color::Transparent;
+		}
+
+		static void StyleSectionTitle(Label^ label) {
+			if (label == nullptr) return;
+			label->Font = gcnew Drawing::Font(L"Segoe UI Semibold", 12.5F, FontStyle::Bold);
+			label->ForeColor = TextColor();
+			label->BackColor = Color::Transparent;
+		}
+
+		static void StyleBodyText(Label^ label) {
+			if (label == nullptr) return;
+			label->Font = gcnew Drawing::Font(L"Segoe UI", 9.6F, FontStyle::Regular);
+			label->ForeColor = MutedTextColor();
+			label->BackColor = Color::Transparent;
+		}
+
+		static void StyleMetricLabel(Label^ label, Color accentColor) {
+			if (label == nullptr) return;
+			label->Font = gcnew Drawing::Font(L"Segoe UI Semibold", 42.0F, FontStyle::Bold);
+			label->ForeColor = accentColor;
+			label->BackColor = Color::Transparent;
 		}
 
 		static void StyleInput(Control^ input) {
 			if (input == nullptr) return;
-			input->BackColor = SurfaceColor();
-			input->ForeColor = TextColor();
+			input->BackColor = Color::White;
+			input->ForeColor = Color::Black;
 			input->Font = gcnew Drawing::Font(L"Segoe UI", 10.5F, FontStyle::Regular);
 			TextBox^ tb = dynamic_cast<TextBox^>(input);
-			if (tb != nullptr) tb->BorderStyle = BorderStyle::FixedSingle;
+			if (tb != nullptr) {
+				tb->BorderStyle = BorderStyle::FixedSingle;
+				tb->ForeColor = Color::Black;
+			}
 			ComboBox^ cb = dynamic_cast<ComboBox^>(input);
-			if (cb != nullptr) cb->FlatStyle = FlatStyle::Flat;
+			if (cb != nullptr) {
+				cb->FlatStyle = FlatStyle::Flat;
+				cb->ForeColor = Color::Black;
+			}
 		}
 
 		static void StyleGrid(DataGridView^ dgv) {
 			if (dgv == nullptr) return;
-			dgv->BackgroundColor = SurfaceColor();
+			dgv->BackgroundColor = Color::White;
 			dgv->BorderStyle = BorderStyle::None;
 			dgv->CellBorderStyle = DataGridViewCellBorderStyle::SingleHorizontal;
 			dgv->GridColor = BorderColor();
@@ -185,34 +311,74 @@ namespace Yakuniyloyiha {
 			dgv->AllowUserToAddRows = false;
 			dgv->ReadOnly = true;
 			dgv->ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle::None;
-			dgv->ColumnHeadersHeight = 42;
-			dgv->RowTemplate->Height = 38;
-			dgv->ColumnHeadersDefaultCellStyle->BackColor = ElevatedColor();
-			dgv->ColumnHeadersDefaultCellStyle->ForeColor = TextColor();
-			dgv->ColumnHeadersDefaultCellStyle->Font = gcnew Drawing::Font(L"Segoe UI Semibold", 10.0F, FontStyle::Bold);
-			dgv->DefaultCellStyle->BackColor = SurfaceColor();
-			dgv->DefaultCellStyle->ForeColor = TextColor();
-			dgv->DefaultCellStyle->SelectionBackColor = DarkMode ? Color::FromArgb(18, 93, 120) : Color::FromArgb(219, 234, 254);
-			dgv->DefaultCellStyle->SelectionForeColor = TextColor();
+			dgv->ColumnHeadersHeight = 45;
+			dgv->RowTemplate->Height = 40;
+			dgv->ColumnHeadersDefaultCellStyle->BackColor = PrimaryColor();
+			dgv->ColumnHeadersDefaultCellStyle->ForeColor = Color::White;
+			dgv->ColumnHeadersDefaultCellStyle->Font = gcnew Drawing::Font(L"Segoe UI Semibold", 11.0F, FontStyle::Bold);
+			dgv->DefaultCellStyle->BackColor = Color::White;
+			dgv->DefaultCellStyle->ForeColor = Color::Black;
+			dgv->DefaultCellStyle->SelectionBackColor = PrimaryColor();
+			dgv->DefaultCellStyle->SelectionForeColor = Color::White;
 			dgv->DefaultCellStyle->Font = gcnew Drawing::Font(L"Segoe UI", 10.0F, FontStyle::Regular);
-			dgv->AlternatingRowsDefaultCellStyle->BackColor = DarkMode ? Color::FromArgb(17, 25, 39) : Color::FromArgb(248, 250, 252);
+			dgv->AlternatingRowsDefaultCellStyle->BackColor = Color::FromArgb(245, 245, 250);
+		}
+
+		static void StyleModernCard(Panel^ card, bool isElevated) {
+			if (card == nullptr) return;
+			card->BackColor = isElevated ? CardElevatedColor() : SurfaceColor();
+			MakeRounded(card, 18);
+			if (isElevated) {
+				card->BorderStyle = BorderStyle::FixedSingle;
+			}
+		}
+
+		static Panel^ CreatePremiumCard(int width, int height, int radius, Color bgColor) {
+			Panel^ card = gcnew Panel();
+			card->Size = System::Drawing::Size(width, height);
+			card->BackColor = bgColor;
+			MakeRounded(card, radius);
+			return card;
 		}
 
 	private:
+		static Dictionary<Control^, cli::array<Color>^>^ gradientMap = gcnew Dictionary<Control^, cli::array<Color>^>();
+
 		static String^ GetSettingsPath() {
 			return Path::Combine(Application::StartupPath, "app_settings.txt");
+		}
+
+		static void RefreshGradientControl(Object^ sender, EventArgs^ e) {
+			Control^ ctrl = dynamic_cast<Control^>(sender);
+			if (ctrl != nullptr) ctrl->Invalidate();
+		}
+
+		static void PaintGradientBackground(Object^ sender, PaintEventArgs^ e) {
+			Control^ ctrl = dynamic_cast<Control^>(sender);
+			if (ctrl == nullptr || !gradientMap->ContainsKey(ctrl)) return;
+
+			cli::array<Color>^ colors = gradientMap[ctrl];
+			if (colors == nullptr || colors->Length < 2) return;
+
+			Rectangle rect = ctrl->ClientRectangle;
+			if (rect.Width <= 0 || rect.Height <= 0) return;
+
+			e->Graphics->SmoothingMode = SmoothingMode::AntiAlias;
+			LinearGradientBrush^ brush = gcnew LinearGradientBrush(
+				Point(rect.Left, rect.Top),
+				Point(rect.Right, rect.Bottom),
+				colors[0],
+				colors[1]
+			);
+			e->Graphics->FillRectangle(brush, rect);
+			delete brush;
 		}
 
 		static void ApplyThemeToControls(Control::ControlCollection^ controls, Color bg, Color panel, Color text, Color muted) {
 			for each (Control ^ c in controls) {
 				if (dynamic_cast<Button^>(c) != nullptr) {
 					Button^ btn = (Button^)c;
-					if (btn->BackColor.ToArgb() == Color::FromArgb(40, 44, 52).ToArgb() || btn->ForeColor == Color::White) {
-						StyleButton(btn, PrimaryColor(), Color::White);
-					}
-					else {
-						StyleButton(btn, panel, text);
-					}
+					StyleButton(btn, PrimaryColor(), Color::White);
 				}
 				else if (dynamic_cast<TextBox^>(c) != nullptr) {
 					StyleInput(c);
@@ -221,20 +387,25 @@ namespace Yakuniyloyiha {
 					StyleInput(c);
 				}
 				else if (dynamic_cast<CheckBox^>(c) != nullptr) {
-					c->ForeColor = text;
-					c->BackColor = bg;
+					Color pColor = (c->Parent != nullptr) ? c->Parent->BackColor : bg;
+					// If background is dark (R+G+B < 380), use white text. Otherwise use normal text.
+					bool isDark = (pColor.R + pColor.G + pColor.B) < 380;
+					c->ForeColor = isDark ? Color::White : text;
+					c->BackColor = Color::Transparent;
 				}
 				else if (dynamic_cast<Label^>(c) != nullptr) {
 					Label^ lbl = (Label^)c;
-					lbl->ForeColor = lbl->Font->Bold ? text : muted;
-					if (lbl->BackColor != Color::Transparent) lbl->BackColor = bg;
+					Color pColor = (c->Parent != nullptr) ? c->Parent->BackColor : bg;
+					bool isDark = (pColor.R + pColor.G + pColor.B) < 380;
+					lbl->ForeColor = isDark ? (lbl->Font->Bold ? Color::White : Color::FromArgb(200, 210, 220)) : (lbl->Font->Bold ? text : muted);
+					if (lbl->BackColor != Color::Transparent) lbl->BackColor = Color::Transparent;
 				}
 				else if (dynamic_cast<DataGridView^>(c) != nullptr) {
 					StyleGrid((DataGridView^)c);
 				}
 				else if (dynamic_cast<Panel^>(c) != nullptr) {
 					if (c->Size.Height <= 2) c->BackColor = BorderColor();
-					else c->BackColor = panel;
+					else if (c->BackColor != Color::Transparent) c->BackColor = panel;
 				}
 				else {
 					c->BackColor = bg;
