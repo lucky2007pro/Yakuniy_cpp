@@ -1492,7 +1492,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		client->Headers[HttpRequestHeader::ContentType] = "application/json";
 
 		String^ loginJson = String::Format(
-			"{{\"card_id\":\"{0}\",\"password\":\"{1}\"}}",
+			"{{\"card_id\":\"{0}\",\"phone\":\"{0}\",\"password\":\"{1}\"}}",
 			EscapeJson(cardId), EscapeJson(password)
 		);
 
@@ -1516,7 +1516,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		return true;
 	}
 
-	private: bool RegisterReader(String^ fullName, String^ phone, String^ password) {
+	private: String^ RegisterReader(String^ fullName, String^ phone, String^ password) {
 		WebClient^ client = gcnew WebClient();
 		client->Encoding = System::Text::Encoding::UTF8;
 		client->Headers[HttpRequestHeader::ContentType] = "application/json";
@@ -1528,8 +1528,9 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			EscapeJson(password)
 		);
 
-		client->UploadString(apiUrl + "readers/register/", "POST", payload);
-		return true;
+		String^ response = client->UploadString(apiUrl + "readers/register/", "POST", payload);
+		String^ generatedCardId = Regex::Match(response, "\"card_id\":\"([^\"]+)\"")->Groups[1]->Value;
+		return generatedCardId;
 	}
 
 	private: System::Void LogoutReader() {
@@ -2070,7 +2071,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		int gapY = 10;
 
 		Label^ lblCardL = gcnew Label();
-		lblCardL->Text = AppSettings::Translate(L"Karta ID", L"Card ID", L"ID карты");
+		lblCardL->Text = AppSettings::Translate(L"Telefon yoki Karta ID", L"Phone or Card ID", L"Телефон или ID карты");
 		lblCardL->Location = Point(left, top);
 		lblCardL->AutoSize = true;
 		top += 22;
@@ -2169,7 +2170,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		try {
 			if (authResult == System::Windows::Forms::DialogResult::No) {
 				if (String::IsNullOrWhiteSpace(txtCardL->Text) || String::IsNullOrWhiteSpace(txtPasswordL->Text)) {
-					MessageBox::Show(AppSettings::Translate(L"Karta ID va parolni kiriting.", L"Enter card ID and password.", L"Введите ID карты и пароль."));
+					MessageBox::Show(AppSettings::Translate(L"Telefon yoki Karta ID va parolni kiriting.", L"Enter phone or card ID and password.", L"Введите телефон или ID карты и пароль."));
 					return;
 				}
 				LoginReader(txtCardL->Text->Trim(), txtPasswordL->Text);
@@ -2189,9 +2190,14 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 					return;
 				}
 
-				RegisterReader(txtName->Text->Trim(), txtPhone->Text->Trim(), txtPasswordR->Text);
+				String^ newCardId = RegisterReader(txtName->Text->Trim(), txtPhone->Text->Trim(), txtPasswordR->Text);
+				String^ msg = AppSettings::Translate(
+					L"Ro'yxatdan o'tdingiz. Karta ID: " + newCardId + L". Endi admin tasdiqlashini kuting. Kartangizni saqlab qoling!",
+					L"Registration completed. Card ID: " + newCardId + L". Please wait for admin approval. Save your Card ID!",
+					L"Регистрация завершена. ID карты: " + newCardId + L". Дождитесь одобрения администратора. Сохраните ID карты!"
+				);
 				MessageBox::Show(
-					AppSettings::Translate(L"Ro'yxatdan o'tdingiz. Endi admin tasdiqlashini kuting.", L"Registration completed. Please wait for admin approval.", L"Регистрация завершена. Дождитесь одобрения администратора."),
+					msg,
 					AppSettings::Translate(L"Qabul qilindi", L"Submitted", L"Отправлено"),
 					MessageBoxButtons::OK,
 					MessageBoxIcon::Information
