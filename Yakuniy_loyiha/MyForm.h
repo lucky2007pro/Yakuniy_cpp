@@ -1,11 +1,16 @@
 #pragma once
 #include "AdminForm.h"
 #include "AboutForm.h"
+#include "LibrariesForm.h"
 #include "StatisticsForm.h"
 #include "ReaderForm.h"
 #include "SettingsForm.h"
 #include "HistoryForm.h"
 #include "AppSettings.h"
+#include "LoginForm.h"
+#include "BookDetailForm.h"
+#include "LibraryCardForm.h"
+#include "FavouritesForm.h"
 
 namespace Yakuniyloyiha {
 
@@ -53,6 +58,27 @@ namespace Yakuniyloyiha {
 			this->lblRecent = (gcnew System::Windows::Forms::Label());
 			this->marqueeTimer = (gcnew System::Windows::Forms::Timer());
 			this->searchDebounceTimer = (gcnew System::Windows::Forms::Timer());
+			this->txtAuthorFilter = (gcnew System::Windows::Forms::TextBox());
+			this->lblAuthorFilter = (gcnew System::Windows::Forms::Label());
+			this->btnFavourites = (gcnew System::Windows::Forms::Button());
+			this->histPanel = (gcnew System::Windows::Forms::Panel());
+			this->histList = (gcnew System::Windows::Forms::ListBox());
+			this->btnLibraries = (gcnew System::Windows::Forms::Button());
+			this->txtIsbnFilter = (gcnew System::Windows::Forms::TextBox());
+			this->lblIsbnFilter = (gcnew System::Windows::Forms::Label());
+			this->_toastPanel = (gcnew System::Windows::Forms::Panel());
+			this->_toastLabel = (gcnew System::Windows::Forms::Label());
+			this->_toastTimer = (gcnew System::Windows::Forms::Timer());
+
+			this->Controls->Add(this->txtAuthorFilter);
+			this->Controls->Add(this->lblAuthorFilter);
+			this->Controls->Add(this->btnFavourites);
+			this->Controls->Add(this->histPanel);
+			this->Controls->Add(this->btnLibraries);
+			this->Controls->Add(this->txtIsbnFilter);
+			this->Controls->Add(this->lblIsbnFilter);
+			this->_toastPanel->Controls->Add(this->_toastLabel);
+			this->Controls->Add(this->_toastPanel);
 
 			this->Controls->Add(this->cmbFilterLibrary);
 			this->Controls->Add(this->cmbFilterSection);
@@ -81,6 +107,14 @@ namespace Yakuniyloyiha {
 			this->cmbSort->SelectedIndexChanged += gcnew System::EventHandler(this, &MyForm::OnFiltersChanged);
 			this->txtSearch->KeyDown += gcnew System::Windows::Forms::KeyEventHandler(this, &MyForm::txtSearch_KeyDown);
 			this->txtSearch->TextChanged += gcnew System::EventHandler(this, &MyForm::txtSearch_TextChanged);
+			this->txtSearch->Enter += gcnew System::EventHandler(this, &MyForm::txtSearch_Enter_History);
+			this->txtAuthorFilter->TextChanged += gcnew System::EventHandler(this, &MyForm::OnFiltersChanged);
+			this->btnLibraries->Click += gcnew System::EventHandler(this, &MyForm::btnLibraries_Click);
+			this->txtIsbnFilter->TextChanged += gcnew System::EventHandler(this, &MyForm::OnFiltersChanged);
+			this->btnFavourites->Click += gcnew System::EventHandler(this, &MyForm::btnFavourites_Click);
+			this->histList->Click += gcnew System::EventHandler(this, &MyForm::histList_Click);
+			this->_toastTimer->Interval = 3200;
+			this->_toastTimer->Tick += gcnew System::EventHandler(this, &MyForm::toastTimer_Tick);
 			this->btnStatusAll->Click += gcnew System::EventHandler(this, &MyForm::btnStatusAll_Click);
 			this->btnStatusAvailable->Click += gcnew System::EventHandler(this, &MyForm::btnStatusAvailable_Click);
 			this->btnStatusReserved->Click += gcnew System::EventHandler(this, &MyForm::btnStatusReserved_Click);
@@ -150,6 +184,17 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
  private: System::Windows::Forms::Label^ lblRecent;
 	private: System::Windows::Forms::Timer^ marqueeTimer;
 	private: System::Windows::Forms::Timer^ searchDebounceTimer;
+private: System::Windows::Forms::Label^ lblAuthorFilter;
+private: System::Windows::Forms::TextBox^ txtAuthorFilter;
+private: System::Windows::Forms::Button^ btnFavourites;
+private: System::Windows::Forms::Panel^ histPanel;
+private: System::Windows::Forms::ListBox^ histList;
+private: System::Windows::Forms::Button^ btnLibraries;
+private: System::Windows::Forms::Panel^ _toastPanel;
+private: System::Windows::Forms::Label^ _toastLabel;
+private: System::Windows::Forms::Timer^ _toastTimer;
+private: System::Windows::Forms::TextBox^ txtIsbnFilter;
+private: System::Windows::Forms::Label^ lblIsbnFilter;
 	private: int marqueeStep = 1;
 	private: bool isUiUpdating = false;
 	private: String^ activeStatusFilter = L"all";
@@ -390,11 +435,8 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		if (flpResults == nullptr) return;
 
 		int sidePadding = 14;
-		int topAnchor = lblMarquee != nullptr ? lblMarquee->Bottom : 144;
-		if (lblRecent != nullptr && lblRecent->Visible) {
-			topAnchor = Math::Max(topAnchor, lblRecent->Bottom);
-		}
-		int topOffset = topAnchor + 14;
+		int topAnchor = 138; // Fixed: right after navbar border (136px + 2px border)
+		int topOffset = topAnchor + 4;
 		int bottomPadding = 12;
 
 		int panelWidth = Math::Max(220, this->ClientSize.Width - (sidePadding * 2));
@@ -425,13 +467,16 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		right = PlaceHeaderButton(btnAdmin, right, topY, 96, gap);
 		right = PlaceHeaderButton(btnSettings, right, topY, 105, gap);
 		right = PlaceHeaderButton(btnAbout, right, topY, 82, gap);
+		right = PlaceHeaderButton(btnLibraries, right, topY, 118, gap);
 		right = PlaceHeaderButton(btnHistory, right, topY, 82, gap);
+		right = PlaceHeaderButton(btnFavourites, right, topY, 118, gap);
 		right = PlaceHeaderButton(btnStat, right, topY, 90, gap);
 		right = PlaceHeaderButton(btnTopBooks, right, topY, 108, gap);
 		right = PlaceHeaderButton(btnReader, right, topY, 108, gap);
 
-		lblSearch->Location = System::Drawing::Point(margin, 20);
-		int searchX = lblSearch->Right + 12;
+		lblSearch->Location = System::Drawing::Point(margin, 18);
+		lblSearch->Visible = false;
+		int searchX = margin + 10; // Start search from left margin directly
 		int searchBtnWidth = 88;
 		int searchWidth = right - searchX - gap - searchBtnWidth;
 		if (searchWidth < 200) searchWidth = 200;
@@ -446,20 +491,20 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		lblFilterLib->Location = System::Drawing::Point(x, row2Y + 3);
 		x = lblFilterLib->Right + 6;
 		cmbFilterLibrary->Location = System::Drawing::Point(x, row2Y);
-		cmbFilterLibrary->Size = System::Drawing::Size(130, 30);
-		x = cmbFilterLibrary->Right + 14;
+		cmbFilterLibrary->Size = System::Drawing::Size(116, 30);
+		x = cmbFilterLibrary->Right + 10;
 
 		lblFilterSec->Location = System::Drawing::Point(x, row2Y + 3);
-		x = lblFilterSec->Right + 6;
+		x = lblFilterSec->Right + 4;
 		cmbFilterSection->Location = System::Drawing::Point(x, row2Y);
-		cmbFilterSection->Size = System::Drawing::Size(130, 30);
-		x = cmbFilterSection->Right + 14;
+		cmbFilterSection->Size = System::Drawing::Size(116, 30);
+		x = cmbFilterSection->Right + 10;
 
 		lblRadius->Location = System::Drawing::Point(x, row2Y + 3);
-		x = lblRadius->Right + 6;
+		x = lblRadius->Right + 4;
 		cmbRadius->Location = System::Drawing::Point(x, row2Y);
-		cmbRadius->Size = System::Drawing::Size(110, 30);
-		x = cmbRadius->Right + 14;
+		cmbRadius->Size = System::Drawing::Size(96, 30);
+		x = cmbRadius->Right + 10;
 
 		chkEbookOnly->Location = System::Drawing::Point(x, row2Y + 4);
 		x = chkEbookOnly->Right + 14;
@@ -469,10 +514,44 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		cmbSort->Location = System::Drawing::Point(x, row2Y);
 		cmbSort->Size = System::Drawing::Size(170, 30);
 
+		// Author + ISBN filters — placed after sort, shown if there is space
+		if (lblAuthorFilter != nullptr && txtAuthorFilter != nullptr) {
+			int ax = cmbSort->Right + 12;
+			int ax2 = ax + Math::Max(50, lblAuthorFilter->PreferredWidth) + 4;
+			int tw = 130;
+			bool hasSpace = (btnShowAll != nullptr) && ((ax2 + tw + 8) < (btnShowAll->Left - 150));
+			lblAuthorFilter->Location = System::Drawing::Point(ax, row2Y + 4);
+			txtAuthorFilter->Location = System::Drawing::Point(ax2, row2Y);
+			txtAuthorFilter->Size = System::Drawing::Size(tw, 30);
+			lblAuthorFilter->Visible = hasSpace;
+			txtAuthorFilter->Visible = hasSpace;
+
+			// ISBN — after author filter
+			if (lblIsbnFilter != nullptr && txtIsbnFilter != nullptr) {
+				int ix = hasSpace ? (txtAuthorFilter->Right + 10) : ax;
+				int ix2 = ix + 44;
+				int tw2 = 110;
+				bool hasSpace2 = (btnShowAll != nullptr) && ((ix2 + tw2 + 8) < (btnShowAll->Left));
+				lblIsbnFilter->Location = System::Drawing::Point(ix, row2Y + 4);
+				txtIsbnFilter->Location = System::Drawing::Point(ix2, row2Y);
+				txtIsbnFilter->Size = System::Drawing::Size(tw2, 30);
+				lblIsbnFilter->Visible = hasSpace && hasSpace2;
+				txtIsbnFilter->Visible = hasSpace && hasSpace2;
+			}
+		}
+
 		btnShowAll->Size = System::Drawing::Size(108, 35);
 		btnShowAll->Location = System::Drawing::Point(this->ClientSize.Width - margin - btnShowAll->Width, row2Y - 2);
 		lblResultCount->AutoSize = true;
 		lblResultCount->Location = System::Drawing::Point(Math::Max(margin, btnShowAll->Left - 210), row2Y + 6);
+
+		// Navbar panellarini kenglikka moslashtirish
+		for each (Control^ c in this->Controls) {
+			if (c->Name == L"__navbarStrip") { c->Size = System::Drawing::Size(this->ClientSize.Width, 136); break; }
+		}
+		for each (Control^ c in this->Controls) {
+			if (c->Name == L"__navBorder") { c->Location = System::Drawing::Point(0, 136); c->Size = System::Drawing::Size(this->ClientSize.Width, 2); break; }
+		}
 
 		int sx = margin;
 		lblStatusFilter->Location = System::Drawing::Point(sx, row3Y + 4);
@@ -489,13 +568,11 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		btnStatusIssued->Location = System::Drawing::Point(sx, row3Y);
 		btnStatusIssued->Size = System::Drawing::Size(95, 30);
 
-		lblMarquee->Top = row3Y + 38;
-		lblMarquee->Left = Math::Max(20, (this->ClientSize.Width - lblMarquee->Width) / 2);
+		// Marquee — navbar ichida quyi band (row3Y + chip quyisi)
+		lblMarquee->Top = 118;
+		lblMarquee->Left = -Math::Max(200, lblMarquee->Width);
 
-		if (lblRecent != nullptr) {
-			lblRecent->Location = System::Drawing::Point(margin, lblMarquee->Bottom + 4);
-			lblRecent->Size = System::Drawing::Size(Math::Max(280, this->ClientSize.Width - (margin * 2)), 22);
-		}
+		if (lblRecent != nullptr) lblRecent->Visible = false;
 		if (lblLocationStatus != nullptr) {
 			lblLocationStatus->AutoSize = true;
 			lblLocationStatus->Location = System::Drawing::Point(Math::Max(margin, this->ClientSize.Width - margin - lblLocationStatus->PreferredWidth), row3Y + 5);
@@ -595,19 +672,9 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		Color elevatedColor = AppSettings::ElevatedColor();
 
 		this->Text = AppSettings::Translate(L"Kutubxona Tizimi", L"Library System", L"Библиотечная система");
-		lblSearch->Text = AppSettings::Translate(L"Kitob nomi (qidiruv):", L"Book title (search):", L"Название книги (поиск):");
-		btnSearch->Text = AppSettings::Translate(L"Izlash", L"Search", L"Поиск");
-		btnReader->Text = AppSettings::Translate(L"O'quvchi", L"Reader", L"Читатель");
-		btnStat->Text = AppSettings::Translate(L"Statistika", L"Statistics", L"Статистика");
-		btnAbout->Text = AppSettings::Translate(L"Haqida", L"About", L"О программе");
-		btnHistory->Text = AppSettings::Translate(L"Tarix", L"History", L"История");
-		btnSettings->Text = AppSettings::Translate(L"Sozlamalar", L"Settings", L"Настройки");
-		btnAdmin->Text = AppSettings::Translate(L"Admin", L"Admin", L"Админ");
-		btnTopBooks->Text = AppSettings::Translate(L"⭐ Top kitoblar", L"⭐ Top books", L"⭐ Топ книги");
-		lblFilterLib->Text = AppSettings::Translate(L"Kutubxona:", L"Library:", L"Библиотека:");
-		lblFilterSec->Text = AppSettings::Translate(L"Bo'lim:", L"Section:", L"Раздел:");
-		lblRadius->Text = AppSettings::Translate(L"Radius:", L"Radius:", L"Радиус:");
-		lblSort->Text = AppSettings::Translate(L"Tartiblash:", L"Sort:", L"Сортировка:");
+		lblSearch->Text = L"";
+		lblSearch->Visible = false; // Hidden — search starts from left
+		lblSort->Text = AppSettings::Translate(L"Sort:", L"Sort:", L"Сорт:");
 		lblStatusFilter->Text = AppSettings::Translate(L"Holat:", L"Status:", L"Статус:");
 		btnStatusAll->Text = AppSettings::Translate(L"Barchasi", L"All", L"Все");
 		btnStatusAvailable->Text = AppSettings::Translate(L"Mavjud", L"Available", L"Доступно");
@@ -618,17 +685,44 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		lblResultCount->Text = AppSettings::Translate(L"Natijalar: 0", L"Results: 0", L"Результаты: 0");
 		lblMarquee->Text = AppSettings::Translate(L"TATU Library • Online band qilish mavjud", L"TATU Library • Online reservation available", L"Библиотека ТАТУ • Доступно онлайн-бронирование");
 		if (lblRecent != nullptr) {
-			if (recentViewedTitles->Count == 0) {
-				lblRecent->Text = AppSettings::Translate(L"So'nggi ko'rilgan: hali yo'q", L"Recently viewed: none yet", L"Недавно просмотренные: пока нет");
-			}
-			else {
-				lblRecent->Text = AppSettings::Translate(L"So'nggi ko'rilgan: ", L"Recently viewed: ", L"Недавно просмотренные: ") + String::Join(L" • ", recentViewedTitles->ToArray());
-			}
+			lblRecent->Visible = false; // Hidden — saves space below navbar
 		}
 
 		this->BackColor = darkBg;
 		this->ForeColor = textColor;
-		this->Font = (gcnew System::Drawing::Font(L"Segoe UI", 10.5F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
+		this->Font = (gcnew System::Drawing::Font(L"Segoe UI", 10.0F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
+
+		// ─ Oq navbar paneli (saytdek) ─
+		Panel^ navbarStrip = nullptr;
+		for each (Control^ c in this->Controls) {
+			if (c->Name == L"__navbarStrip") { navbarStrip = dynamic_cast<Panel^>(c); break; }
+		}
+		if (navbarStrip == nullptr) {
+			navbarStrip = gcnew Panel();
+			navbarStrip->Name = L"__navbarStrip";
+			this->Controls->Add(navbarStrip);
+		}
+		navbarStrip->Location = System::Drawing::Point(0, 0);
+		navbarStrip->Size = System::Drawing::Size(this->ClientSize.Width, 136);
+		navbarStrip->BackColor = AppSettings::NavbarColor();
+		navbarStrip->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left | AnchorStyles::Right);
+		navbarStrip->SendToBack();
+
+		// ─ Navbar bottom border (1px, slate-200) ─
+		Panel^ navBorder = nullptr;
+		for each (Control^ c in this->Controls) {
+			if (c->Name == L"__navBorder") { navBorder = dynamic_cast<Panel^>(c); break; }
+		}
+		if (navBorder == nullptr) {
+			navBorder = gcnew Panel();
+			navBorder->Name = L"__navBorder";
+			this->Controls->Add(navBorder);
+		}
+		navBorder->Location = System::Drawing::Point(0, 136);
+		navBorder->Size = System::Drawing::Size(this->ClientSize.Width, 2);
+		navBorder->BackColor = AppSettings::NavbarBorderColor();
+		navBorder->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left | AnchorStyles::Right);
+		navBorder->BringToFront();
 
 		AppSettings::StyleSectionTitle(lblSearch);
 		lblSearch->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left);
@@ -648,7 +742,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			? System::Drawing::Color::FromArgb(55, 65, 81)
 			: System::Drawing::Color::FromArgb(209, 213, 219);
 
-        array<Button^>^ buttons = { btnSearch, btnReader, btnStat, btnHistory, btnAbout, btnSettings, btnAdmin, btnShowAll, btnTopBooks };
+        array<Button^>^ buttons = { btnSearch, btnReader, btnStat, btnHistory, btnAbout, btnSettings, btnAdmin, btnShowAll, btnTopBooks, btnFavourites };
 		for each (Button^ btn in buttons) {
 			if (btn != nullptr) {
 				AppSettings::StyleModernButton(btn, true);
@@ -656,15 +750,41 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			}
 		}
 
-		// Secondary (ikkilamchi) tugmalarga rounded + border qo'shamiz — light mode'da ko'rinib tursin
-		array<Button^>^ secondaryBtns = { btnReader, btnStat, btnHistory, btnAbout, btnSettings, btnShowAll, btnTopBooks };
-		for each (Button^ sb in secondaryBtns) {
+		// Saytdek "nav link" ko'rinish — oq bg, slate rang, ingichka border
+		array<Button^>^ navLinkBtns = { btnStat, btnHistory, btnAbout, btnSettings, btnTopBooks, btnLibraries };
+		for each (Button^ sb in navLinkBtns) {
 			if (sb == nullptr) continue;
-			sb->BackColor = AppSettings::ElevatedColor();
-			sb->ForeColor = textColor;
-			sb->FlatAppearance->BorderSize = 2;
-			sb->FlatAppearance->BorderColor = AppSettings::BorderColor();
+			sb->BackColor = AppSettings::NavbarColor();
+			sb->ForeColor = AppSettings::MutedTextColor();
+			sb->FlatAppearance->BorderSize = 0;
 			sb->FlatAppearance->MouseOverBackColor = AppSettings::CardHoverColor();
+			sb->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 9.0F, System::Drawing::FontStyle::Bold);
+		}
+		// Reader/Login button — outline style
+		if (btnReader != nullptr) {
+			btnReader->BackColor = AppSettings::NavbarColor();
+			btnReader->ForeColor = AppSettings::TextColor();
+			btnReader->FlatAppearance->BorderSize = 1;
+			btnReader->FlatAppearance->BorderColor = AppSettings::BorderColor();
+			btnReader->FlatAppearance->MouseOverBackColor = AppSettings::CardHoverColor();
+		}
+		// Favourites — red accent like web
+		if (btnFavourites != nullptr) {
+			btnFavourites->BackColor = AppSettings::DarkMode
+				? System::Drawing::Color::FromArgb(127, 29, 29)
+				: System::Drawing::Color::FromArgb(254, 242, 242);
+			btnFavourites->ForeColor = System::Drawing::Color::FromArgb(220, 38, 38);
+			btnFavourites->FlatAppearance->BorderSize = 0;
+			btnFavourites->FlatAppearance->MouseOverBackColor = System::Drawing::Color::FromArgb(254, 226, 226);
+			btnFavourites->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 9.0F, System::Drawing::FontStyle::Bold);
+		}
+		// ShowAll (Reset) — outline
+		if (btnShowAll != nullptr) {
+			btnShowAll->BackColor = AppSettings::NavbarColor();
+			btnShowAll->ForeColor = AppSettings::MutedTextColor();
+			btnShowAll->FlatAppearance->BorderSize = 1;
+			btnShowAll->FlatAppearance->BorderColor = AppSettings::BorderColor();
+			btnShowAll->FlatAppearance->MouseOverBackColor = AppSettings::CardHoverColor();
 		}
 
 		btnSearch->Location = System::Drawing::Point(510, 20);
@@ -694,6 +814,8 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		btnSettings->Size = System::Drawing::Size(105, 35);
 		btnSettings->Text = AppSettings::Translate(L"Sozlamalar", L"Settings", L"Настройки");
 		btnSettings->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
+
+		btnLibraries->Text = AppSettings::Translate(L"Kutubxonalar", L"Libraries", L"Библиотеки");
 
 		btnAdmin->Location = System::Drawing::Point(1095, 20);
 		btnAdmin->Size = System::Drawing::Size(100, 35);
@@ -769,40 +891,114 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			AppSettings::MakeRounded(sb, 12);
 		}
 
-		Color chipBg = AppSettings::ElevatedColor();
-		Color chipFg = textMuted;
-		Color chipActiveBg = accentColor;
-		Color chipActiveFg = AppSettings::PrimaryTextColor();
+		// Status chip ranglari (saytdek: faqat active chip to'liq rangli, qolganlar outline)
+		Color chipNavBg   = AppSettings::NavbarColor();
+		Color chipInactFg = textMuted;
+		Color chipActBg   = accentColor;
+		Color chipActFg   = System::Drawing::Color::White;
+		Color chipBorderC = AppSettings::BorderColor();
+		Color chipHover   = AppSettings::CardHoverColor();
+		Color chipActHov  = AppSettings::PrimaryHoverColor();
 
-		btnStatusAll->BackColor = activeStatusFilter == L"all" ? chipActiveBg : chipBg;
-		btnStatusAll->ForeColor = activeStatusFilter == L"all" ? chipActiveFg : chipFg;
-		btnStatusAvailable->BackColor = activeStatusFilter == L"available" ? chipActiveBg : chipBg;
-		btnStatusAvailable->ForeColor = activeStatusFilter == L"available" ? chipActiveFg : chipFg;
-		btnStatusReserved->BackColor = activeStatusFilter == L"reserved" ? chipActiveBg : chipBg;
-		btnStatusReserved->ForeColor = activeStatusFilter == L"reserved" ? chipActiveFg : chipFg;
-		btnStatusIssued->BackColor = activeStatusFilter == L"issued" ? chipActiveBg : chipBg;
-		btnStatusIssued->ForeColor = activeStatusFilter == L"issued" ? chipActiveFg : chipFg;
+		// btnStatusAll
+		if (btnStatusAll != nullptr) {
+			bool a = (activeStatusFilter == L"all");
+			btnStatusAll->BackColor = a ? chipActBg : chipNavBg;
+			btnStatusAll->ForeColor = a ? chipActFg : chipInactFg;
+			btnStatusAll->FlatAppearance->BorderSize = a ? 0 : 1;
+			btnStatusAll->FlatAppearance->BorderColor = chipBorderC;
+			btnStatusAll->FlatAppearance->MouseOverBackColor = a ? chipActHov : chipHover;
+		}
+		// btnStatusAvailable
+		if (btnStatusAvailable != nullptr) {
+			bool a = (activeStatusFilter == L"available");
+			btnStatusAvailable->BackColor = a ? chipActBg : chipNavBg;
+			btnStatusAvailable->ForeColor = a ? chipActFg : chipInactFg;
+			btnStatusAvailable->FlatAppearance->BorderSize = a ? 0 : 1;
+			btnStatusAvailable->FlatAppearance->BorderColor = chipBorderC;
+			btnStatusAvailable->FlatAppearance->MouseOverBackColor = a ? chipActHov : chipHover;
+		}
+		// btnStatusReserved
+		if (btnStatusReserved != nullptr) {
+			bool a = (activeStatusFilter == L"reserved");
+			btnStatusReserved->BackColor = a ? chipActBg : chipNavBg;
+			btnStatusReserved->ForeColor = a ? chipActFg : chipInactFg;
+			btnStatusReserved->FlatAppearance->BorderSize = a ? 0 : 1;
+			btnStatusReserved->FlatAppearance->BorderColor = chipBorderC;
+			btnStatusReserved->FlatAppearance->MouseOverBackColor = a ? chipActHov : chipHover;
+		}
+		// btnStatusIssued
+		if (btnStatusIssued != nullptr) {
+			bool a = (activeStatusFilter == L"issued");
+			btnStatusIssued->BackColor = a ? chipActBg : chipNavBg;
+			btnStatusIssued->ForeColor = a ? chipActFg : chipInactFg;
+			btnStatusIssued->FlatAppearance->BorderSize = a ? 0 : 1;
+			btnStatusIssued->FlatAppearance->BorderColor = chipBorderC;
+			btnStatusIssued->FlatAppearance->MouseOverBackColor = a ? chipActHov : chipHover;
+		}
 
 		lblResultCount->AutoSize = true;
 		lblResultCount->Location = System::Drawing::Point(1060, 72);
 		lblResultCount->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
 
-		lblMarquee->Text = AppSettings::Translate(L"TATU Library • Online band qilish mavjud", L"TATU Library • Online reservation available", L"Библиотека ТАТУ • Доступно онлайн-бронирование");
-		lblMarquee->AutoSize = true;
-		lblMarquee->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 12.0F, System::Drawing::FontStyle::Bold);
-		lblMarquee->ForeColor = accentColor;
-		lblMarquee->BackColor = System::Drawing::Color::Transparent;
-        lblMarquee->Location = System::Drawing::Point(-lblMarquee->PreferredWidth, 136);
-
-		if (lblRecent != nullptr) {
-			lblRecent->Font = gcnew System::Drawing::Font(L"Segoe UI", 9.4F, System::Drawing::FontStyle::Regular);
-			lblRecent->ForeColor = textMuted;
-			lblRecent->AutoEllipsis = true;
+		// Author filter styling
+		if (lblAuthorFilter != nullptr) {
+			lblAuthorFilter->Text = AppSettings::Translate(L"Muallif:", L"Author:", L"Автор:");
+			lblAuthorFilter->ForeColor = textMuted;
+			lblAuthorFilter->AutoSize = true;
+		}
+		if (txtAuthorFilter != nullptr) {
+			AppSettings::StyleInput(txtAuthorFilter);
+			txtAuthorFilter->Font = gcnew System::Drawing::Font(L"Segoe UI", 10.0F);
+		}
+		// btnFavourites label
+		if (btnFavourites != nullptr) {
+			btnFavourites->Text = AppSettings::Translate(L"❤ Sevimlilar", L"❤ Favourites", L"❤ Избранные");
+		}
+		// ISBN filter
+		if (lblIsbnFilter != nullptr) {
+			lblIsbnFilter->Text = L"ISBN:";
+			lblIsbnFilter->ForeColor = textMuted;
+			lblIsbnFilter->AutoSize = true;
+		}
+		if (txtIsbnFilter != nullptr) {
+			AppSettings::StyleInput(txtIsbnFilter);
+			txtIsbnFilter->Font = gcnew System::Drawing::Font(L"Segoe UI", 10.0F);
+		}
+		// Toast panel
+		if (_toastPanel != nullptr) {
+			_toastPanel->Visible = false;
+			_toastPanel->Size = System::Drawing::Size(310, 50);
+			AppSettings::MakeRounded(_toastPanel, 10);
+			_toastLabel->Dock = DockStyle::Fill;
+			_toastLabel->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 10.5F);
+			_toastLabel->ForeColor = System::Drawing::Color::White;
+			_toastLabel->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
+			_toastPanel->BringToFront();
+		}
+		// History popup panel
+		if (histPanel != nullptr && histList != nullptr) {
+			histPanel->BackColor = AppSettings::SurfaceColor();
+			histPanel->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
+			histPanel->Visible = false;
+			histList->Font = gcnew System::Drawing::Font(L"Segoe UI", 10.0F);
+			histList->BackColor = AppSettings::SurfaceColor();
+			histList->ForeColor = AppSettings::TextColor();
+			histList->BorderStyle = System::Windows::Forms::BorderStyle::None;
+			if (histPanel->Controls->Count == 0) { histPanel->Controls->Add(histList); histList->Dock = DockStyle::Fill; }
 		}
 
-	    flpResults->Location = System::Drawing::Point(14, 148);
+		// Marquee — navbar ichida quyi qismda (past qatorda)
+		lblMarquee->Text = AppSettings::Translate(L"TATU Library • Online band qilish mavjud", L"TATU Library • Online reservation available", L"Библиотека ТАТУ • Доступно онлайн-бронирование");
+		lblMarquee->AutoSize = true;
+		lblMarquee->Font = gcnew System::Drawing::Font(L"Segoe UI", 8.5F);
+		lblMarquee->ForeColor = textMuted;
+		lblMarquee->BackColor = AppSettings::NavbarColor();
+        lblMarquee->Location = System::Drawing::Point(-lblMarquee->PreferredWidth, 120);
+
+	    flpResults->Location = System::Drawing::Point(14, 142);
 		flpResults->Size = System::Drawing::Size(1200, 450);
-		flpResults->BackColor = elevatedColor;
+		flpResults->BackColor = AppSettings::PageBackColor();
 		flpResults->AutoScroll = true;
 		flpResults->WrapContents = true;
 		flpResults->Padding = System::Windows::Forms::Padding(12);
@@ -894,6 +1090,14 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 
 		System::Drawing::Bitmap^ emptyImage = gcnew System::Drawing::Bitmap(1, 1);
 
+		// Qidiruv tarixini saqlash
+		if (txtSearch != nullptr && !String::IsNullOrWhiteSpace(txtSearch->Text)) SaveSearchHistory(txtSearch->Text->Trim());
+		if (histPanel != nullptr) histPanel->Visible = false;
+
+		String^ authorFilter = (txtAuthorFilter != nullptr && !String::IsNullOrWhiteSpace(txtAuthorFilter->Text))
+			? txtAuthorFilter->Text->ToLower()->Trim() : L"";
+		String^ isbnFilter = (txtIsbnFilter != nullptr && !String::IsNullOrWhiteSpace(txtIsbnFilter->Text))
+			? txtIsbnFilter->Text->Trim() : L"";
 		String^ search = txtSearch->Text != nullptr ? txtSearch->Text->ToLower() : L"";
 		String^ libFilter = cmbFilterLibrary->Text != nullptr ? cmbFilterLibrary->Text : L"Barchasi";
 		String^ secFilter = cmbFilterSection->Text != nullptr ? cmbFilterSection->Text : L"Barchasi";
@@ -935,7 +1139,10 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		try {
 			WebClient^ client = gcnew WebClient();
 			client->Encoding = System::Text::Encoding::UTF8;
-			String^ json = client->DownloadString(apiUrl + "books/");
+			String^ booksUrl = apiUrl + "books/?page_size=100";
+			if (!String::IsNullOrWhiteSpace(isbnFilter))
+				booksUrl += "&isbn=" + Uri::EscapeDataString(isbnFilter);
+			String^ json = client->DownloadString(booksUrl);
 			
 			// Extract book objects in JSON securely
 			System::Collections::Generic::List<String^>^ books = AppSettings::ExtractJsonObjects(json);
@@ -953,6 +1160,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				String^ libIdText = Regex::Match(obj, "\"library\":(\\d+)")->Groups[1]->Value;
 				String^ libLatText = Regex::Match(obj, "\"library_latitude\":(-?[\\d\\.]+)")->Groups[1]->Value;
 				String^ libLonText = Regex::Match(obj, "\"library_longitude\":(-?[\\d\\.]+)")->Groups[1]->Value;
+				String^ authorName = Regex::Match(obj, "\"author_name\":\"([^\"]+)\"")->Groups[1]->Value;
 
 				// Media URLlarni absolutga aylantirish (agar nisbiy bo'lsa)
 				if (!String::IsNullOrEmpty(coverImg) && coverImg != "null" && !coverImg->StartsWith(L"http")) {
@@ -966,14 +1174,15 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				double libLat = ParseCoordinate(libLatText, 41.3110);
 				double libLon = ParseCoordinate(libLonText, 69.2401);
 				
-				bool matchSearch = String::IsNullOrWhiteSpace(search) || title->ToLower()->Contains(search);
+				bool matchSearch = String::IsNullOrWhiteSpace(search) || title->ToLower()->Contains(search) || authorName->ToLower()->Contains(search);
+				bool matchAuthor = String::IsNullOrWhiteSpace(authorFilter) || authorName->ToLower()->Contains(authorFilter);
 				bool matchLib = (libFilter == L"Barchasi" || libFilter == libName);
 				bool matchSec = (secFilter == L"Barchasi" || secFilter == secName);
 
 				bool hasEbook = !String::IsNullOrEmpty(ebookPath) && ebookPath != "null";
 				if (onlyEbooks && !hasEbook) continue;
 
-				if (matchSearch && matchLib && matchSec) {
+				if (matchSearch && matchLib && matchSec && matchAuthor) {
 					double dist = CalculateDistance(userLat, userLon, libLat, libLon);
 					if (maxRadius > 0 && dist > maxRadius) continue;
 
@@ -1010,7 +1219,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 					}
 					if (!statusMatches) continue;
 
-					array<Object^>^ resRow = gcnew array<Object^>(14);
+					array<Object^>^ resRow = gcnew array<Object^>(16);
 					resRow[0] = img;
 					resRow[1] = title;
 					resRow[2] = libName;
@@ -1025,6 +1234,8 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 					resRow[11] = (ebookPath == "null") ? "" : ebookPath;
 					resRow[12] = bookIdText;  // book ID
 					resRow[13] = libIdText;   // library ID
+					resRow[14] = authorName;  // author name
+					resRow[15] = coverImg;    // cover URL for favourites
 
 					results->Add(resRow);
 				}
@@ -1097,7 +1308,21 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 				pb->Location = System::Drawing::Point(0, 0);
 				pb->SizeMode = PictureBoxSizeMode::StretchImage;
 				pb->Image = dynamic_cast<Image^>(res[0]);
-				if (pb->Image == emptyImage) { pb->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(20, 27, 42) : System::Drawing::Color::FromArgb(226, 232, 240); }
+				if (pb->Image == emptyImage) {
+					pb->BackColor = AppSettings::DarkMode
+						? System::Drawing::Color::FromArgb(22, 32, 54)
+						: System::Drawing::Color::FromArgb(219, 234, 254); // blue-100
+					Label^ noImgLbl = gcnew Label();
+					noImgLbl->Text = AppSettings::Translate(L"Muqova\nyo'q", L"No\nCover", L"\u041dет\nобложки");
+					noImgLbl->Font = gcnew System::Drawing::Font(L"Segoe UI", 9.5F, System::Drawing::FontStyle::Regular);
+					noImgLbl->ForeColor = AppSettings::DarkMode
+						? System::Drawing::Color::FromArgb(100, 140, 200)
+						: System::Drawing::Color::FromArgb(96, 165, 250); // blue-400
+					noImgLbl->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
+					noImgLbl->Dock = DockStyle::Fill;
+					noImgLbl->BackColor = System::Drawing::Color::Transparent;
+					pb->Controls->Add(noImgLbl);
+				}
 
 				Label^ lblTitle = gcnew Label();
 				lblTitle->Name = L"title";
@@ -1116,19 +1341,23 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 
 				Label^ lblStat = gcnew Label();
 				lblStat->Name = L"status";
-				lblStat->Text = res[7]->ToString();
-				lblStat->Font = gcnew System::Drawing::Font(L"Segoe UI", 10.0F, System::Drawing::FontStyle::Bold);
-				lblStat->Location = System::Drawing::Point(10, imageHeight + 88);
 				String^ statusText = res[7]->ToString();
+				System::Drawing::Color statColor;
 				if (statusText == AppSettings::Translate(L"Berilgan", L"Issued", L"Выдано")) {
-					lblStat->ForeColor = AppSettings::DangerColor();
+					statColor = AppSettings::DangerColor();
+					lblStat->Text = L"\u25cf " + statusText;
 				}
 				else if (statusText == AppSettings::Translate(L"Band qilingan", L"Reserved", L"Забронировано")) {
-					lblStat->ForeColor = AppSettings::WarningColor();
+					statColor = AppSettings::WarningColor();
+					lblStat->Text = L"\u25cf " + statusText;
 				}
 				else {
-					lblStat->ForeColor = AppSettings::SuccessColor();
+					statColor = AppSettings::SuccessColor();
+					lblStat->Text = L"\u25cf " + statusText;
 				}
+				lblStat->ForeColor = statColor;
+				lblStat->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 9.0F, System::Drawing::FontStyle::Bold);
+				lblStat->Location = System::Drawing::Point(10, imageHeight + 86);
 				lblStat->AutoSize = true;
 
 				Label^ lblMeta = gcnew Label();
@@ -1144,29 +1373,33 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 
 				Button^ btnMiniRoute = gcnew Button();
 				btnMiniRoute->Name = L"route";
-				btnMiniRoute->Text = AppSettings::Translate(L"Yo'nalish", L"Route", L"Маршрут");
+				btnMiniRoute->Text = AppSettings::Translate(L"Xarita", L"Map", L"Xarita");
 				btnMiniRoute->Location = System::Drawing::Point(10, imageHeight + 140);
 				btnMiniRoute->Size = System::Drawing::Size((cardWidth - 30) / 2, 30);
 				btnMiniRoute->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
-				btnMiniRoute->FlatAppearance->BorderSize = 0;
-				btnMiniRoute->BackColor = AppSettings::PrimaryColor();
-				btnMiniRoute->ForeColor = AppSettings::PrimaryTextColor();
+				btnMiniRoute->FlatAppearance->BorderSize = 1;
+				btnMiniRoute->FlatAppearance->BorderColor = AppSettings::BorderColor();
+				btnMiniRoute->BackColor = AppSettings::NavbarColor();
+				btnMiniRoute->ForeColor = AppSettings::TextColor();
 				btnMiniRoute->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 8.8F, System::Drawing::FontStyle::Bold);
 				btnMiniRoute->Cursor = Cursors::Hand;
 				MakeRounded(btnMiniRoute, 8);
 
 				Button^ btnMiniOpen = gcnew Button();
 				btnMiniOpen->Name = L"open";
-				btnMiniOpen->Text = AppSettings::Translate(L"Ochish", L"Open", L"Открыть");
+				btnMiniOpen->Text = AppSettings::Translate(L"Batafsil", L"Details", L"Подробнее");
 				btnMiniOpen->Location = System::Drawing::Point(20 + ((cardWidth - 30) / 2), imageHeight + 140);
 				btnMiniOpen->Size = System::Drawing::Size((cardWidth - 30) / 2, 30);
 				btnMiniOpen->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
 				btnMiniOpen->FlatAppearance->BorderSize = 0;
-				btnMiniOpen->BackColor = AppSettings::ElevatedColor();
-				btnMiniOpen->ForeColor = AppSettings::TextColor();
+				btnMiniOpen->BackColor = AppSettings::PrimaryColor();
+				btnMiniOpen->ForeColor = System::Drawing::Color::White;
 				btnMiniOpen->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 8.8F, System::Drawing::FontStyle::Bold);
 				btnMiniOpen->Cursor = Cursors::Hand;
 				MakeRounded(btnMiniOpen, 8);
+
+				// Paint event: draws subtle rounded border
+				card->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &MyForm::Card_Paint);
 
 				EventHandler^ clickHnd = gcnew EventHandler(this, &MyForm::Card_Click);
 				EventHandler^ hoverInHnd = gcnew EventHandler(this, &MyForm::Card_MouseEnter);
@@ -1194,6 +1427,31 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 
 				card->Tag = res; pb->Tag = res; lblTitle->Tag = res; lblDist->Tag = res; lblStat->Tag = res; lblMeta->Tag = res; btnMiniRoute->Tag = res; btnMiniOpen->Tag = res;
 				card->Controls->Add(pb); card->Controls->Add(lblTitle); card->Controls->Add(lblDist); card->Controls->Add(lblStat); card->Controls->Add(lblMeta); card->Controls->Add(btnMiniRoute); card->Controls->Add(btnMiniOpen);
+
+				// Heart (sevimli) tugma
+				{
+					String^ bid = res[12] != nullptr ? res[12]->ToString() : L"";
+					String^ aname = (res->Length > 14 && res[14] != nullptr) ? res[14]->ToString() : L"";
+					String^ curl  = (res->Length > 15 && res[15] != nullptr) ? res[15]->ToString() : L"";
+					bool fav = !String::IsNullOrWhiteSpace(bid) && FavouritesForm::IsFav(bid);
+					Button^ btnHrt = gcnew Button();
+					btnHrt->Name = L"heart";
+					btnHrt->Text = fav ? L"❤" : L"♡";
+					btnHrt->Size = System::Drawing::Size(28, 28);
+					btnHrt->Location = System::Drawing::Point(cardWidth - 34, 6);
+					btnHrt->FlatStyle = FlatStyle::Flat;
+					btnHrt->FlatAppearance->BorderSize = 0;
+					btnHrt->BackColor = System::Drawing::Color::FromArgb(fav ? 210 : 110, 220, 38, 38);
+					btnHrt->ForeColor = System::Drawing::Color::White;
+					btnHrt->Font = gcnew System::Drawing::Font(L"Segoe UI", 11.0F);
+					btnHrt->Cursor = Cursors::Hand;
+					btnHrt->Tag = gcnew array<String^>{bid, res[1]->ToString(), aname, curl, res[7]->ToString(), res[3]->ToString()};
+					btnHrt->Click += gcnew EventHandler(this, &MyForm::btnHeart_Click);
+					MakeRounded(btnHrt, 14);
+					card->Controls->Add(btnHrt);
+					btnHrt->BringToFront();
+				}
+
 				flpResults->Controls->Add(card);
 			}
 		} catch (...) {
@@ -1228,13 +1486,37 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		}
 	}
 
+	private: System::Void Card_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
+		Panel^ card = dynamic_cast<Panel^>(sender);
+		if (card == nullptr) return;
+		System::Drawing::Graphics^ g = e->Graphics;
+		g->SmoothingMode = System::Drawing::Drawing2D::SmoothingMode::AntiAlias;
+		// Draw 1px inside Region so border is fully visible (matches MakeRounded radius=12)
+		int x = 1, y = 1, r = 11;
+		int w = card->Width - 2, h = card->Height - 2;
+		System::Drawing::Drawing2D::GraphicsPath^ path = gcnew System::Drawing::Drawing2D::GraphicsPath();
+		path->AddArc(x, y, r * 2, r * 2, 180, 90);
+		path->AddArc(x + w - r * 2, y, r * 2, r * 2, 270, 90);
+		path->AddArc(x + w - r * 2, y + h - r * 2, r * 2, r * 2, 0, 90);
+		path->AddArc(x, y + h - r * 2, r * 2, r * 2, 90, 90);
+		path->CloseFigure();
+		System::Drawing::Color borderCol = AppSettings::DarkMode
+			? System::Drawing::Color::FromArgb(55, 255, 255, 255)
+			: System::Drawing::Color::FromArgb(180, 226, 232, 240); // slate-200
+		System::Drawing::Pen^ pen = gcnew System::Drawing::Pen(borderCol, 1.0F);
+		g->DrawPath(pen, path);
+	}
+
 	private: System::Void Card_MouseEnter(System::Object^ sender, System::EventArgs^ e) {
 		Control^ c = dynamic_cast<Control^>(sender);
 		if (c == nullptr) return;
 		Panel^ card = dynamic_cast<Panel^>(c);
 		if (card == nullptr) card = dynamic_cast<Panel^>(c->Parent);
 		if (card == nullptr) return;
-		card->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(26, 45, 62) : System::Drawing::Color::FromArgb(239, 246, 255);
+		card->BackColor = AppSettings::DarkMode
+			? System::Drawing::Color::FromArgb(26, 45, 62)
+			: System::Drawing::Color::FromArgb(241, 245, 249); // slate-100
+		card->Invalidate();
 	}
 
 	private: System::Void Card_MouseLeave(System::Object^ sender, System::EventArgs^ e) {
@@ -1244,6 +1526,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		if (card == nullptr) card = dynamic_cast<Panel^>(c->Parent);
 		if (card == nullptr) return;
 		card->BackColor = AppSettings::SurfaceColor();
+		card->Invalidate();
 	}
 
 	private: System::Void ShowLoadingSkeleton(int count) {
@@ -1295,7 +1578,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 	private: System::Void ShowBookDetails(array<Object^>^ res) {
 		Form^ fd = gcnew Form();
 		fd->Text = AppSettings::Translate(L"Kitob haqida ma'lumot", L"Book details", L"Информация о книге");
-		fd->Size = System::Drawing::Size(660, 520);
+		fd->Size = System::Drawing::Size(660, 600);
 		fd->BackColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(24, 26, 27) : System::Drawing::Color::White;
 		fd->ForeColor = AppSettings::DarkMode ? System::Drawing::Color::FromArgb(236, 240, 241) : System::Drawing::Color::FromArgb(33, 37, 41);
 		fd->StartPosition = FormStartPosition::CenterParent;
@@ -1381,7 +1664,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 
 		Button^ btnOk = gcnew Button();
 		btnOk->Text = AppSettings::Translate(L"Yopish", L"Close", L"Закрыть");
-		btnOk->Location = System::Drawing::Point(500, 430);
+		btnOk->Location = System::Drawing::Point(500, 510);
 		btnOk->Size = System::Drawing::Size(120, 40);
 		btnOk->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
 		btnOk->FlatAppearance->BorderSize = 0;
@@ -1394,7 +1677,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 
 		Button^ btnMap = gcnew Button();
 		btnMap->Text = AppSettings::Translate(L"Yo'nalish", L"Route", L"Маршрут");
-		btnMap->Location = System::Drawing::Point(360, 430);
+		btnMap->Location = System::Drawing::Point(360, 510);
 		btnMap->Size = System::Drawing::Size(120, 40);
 		btnMap->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
 		btnMap->FlatAppearance->BorderSize = 0;
@@ -1408,7 +1691,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 
 		Button^ btnEbook = gcnew Button();
 		btnEbook->Text = AppSettings::Translate(L"E-kitob", L"E-book", L"Эл. книга");
-		btnEbook->Location = System::Drawing::Point(220, 430);
+		btnEbook->Location = System::Drawing::Point(220, 510);
 		btnEbook->Size = System::Drawing::Size(120, 40);
 		btnEbook->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
 		btnEbook->FlatAppearance->BorderSize = 0;
@@ -1480,7 +1763,79 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 
 		reserveBox->Controls->Add(btnReserve);
 
+		// Navbat tugmasi — kitob mavjud bo'lmasa ko'rsatiladi
+		Button^ btnWaitlist = gcnew Button();
+		btnWaitlist->Text = AppSettings::Translate(L"📋 Navbatga", L"📋 Waitlist", L"📋 Очередь");
+		btnWaitlist->Location = System::Drawing::Point(200, 88);
+		btnWaitlist->Size = System::Drawing::Size(188, 40);
+		btnWaitlist->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
+		btnWaitlist->FlatAppearance->BorderSize = 0;
+		btnWaitlist->BackColor = System::Drawing::Color::FromArgb(124, 58, 237);
+		btnWaitlist->ForeColor = System::Drawing::Color::White;
+		btnWaitlist->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 9.5F, System::Drawing::FontStyle::Bold);
+		btnWaitlist->Cursor = System::Windows::Forms::Cursors::Hand;
+		btnWaitlist->Tag = res;
+		btnWaitlist->Visible = !canReserve;
+		btnWaitlist->Click += gcnew System::EventHandler(this, &MyForm::btnWaitlist_Click);
+		MakeRounded(btnWaitlist, 10);
+		reserveBox->Controls->Add(btnWaitlist);
+
 		fd->Controls->Add(reserveBox);
+
+		// O'xshash kitoblar bo'limi
+		{
+			String^ secNameSim = res[3]->ToString();
+			Label^ lblSim = gcnew Label();
+			lblSim->Text = AppSettings::Translate(L"✨ O'xshash kitoblar:", L"✨ Similar books:", L"✨ Похожие книги:");
+			lblSim->Location = System::Drawing::Point(30, 442);
+			lblSim->AutoSize = true;
+			lblSim->Font = gcnew System::Drawing::Font(L"Segoe UI Semibold", 10.0F, FontStyle::Bold);
+			lblSim->ForeColor = AppSettings::TextColor();
+			fd->Controls->Add(lblSim);
+
+			FlowLayoutPanel^ flpSim = gcnew FlowLayoutPanel();
+			flpSim->Location = System::Drawing::Point(170, 436);
+			flpSim->Size = System::Drawing::Size(460, 52);
+			flpSim->AutoScroll = false;
+			flpSim->WrapContents = false;
+			flpSim->BackColor = System::Drawing::Color::Transparent;
+			fd->Controls->Add(flpSim);
+
+			try {
+				WebClient^ simCl = gcnew WebClient();
+				simCl->Encoding = System::Text::Encoding::UTF8;
+				String^ simJson = simCl->DownloadString(apiUrl + L"books/?limit=12");
+				auto simItems = AppSettings::ExtractJsonObjects(simJson);
+				String^ curTitleLow = res[1]->ToString()->ToLower();
+				int added = 0;
+				for each (String^ obj in simItems) {
+					if (added >= 5) break;
+					String^ st = Regex::Match(obj, "\"title\":\"([^\"]+)\"")->Groups[1]->Value;
+					String^ ss = Regex::Match(obj, "\"section_name\":\"([^\"]+)\"")->Groups[1]->Value;
+					if (st->ToLower() == curTitleLow || String::IsNullOrWhiteSpace(st)) continue;
+					if (!String::IsNullOrWhiteSpace(secNameSim) && ss != secNameSim) continue;
+					Button^ chip = gcnew Button();
+					chip->Text = (st->Length > 14) ? st->Substring(0, 13) + L"…" : st;
+					chip->Size = System::Drawing::Size(86, 40);
+					chip->FlatStyle = FlatStyle::Flat;
+					chip->FlatAppearance->BorderSize = 1;
+					chip->FlatAppearance->BorderColor = AppSettings::BorderColor();
+					chip->BackColor = AppSettings::ElevatedColor();
+					chip->ForeColor = AppSettings::TextColor();
+					chip->Font = gcnew System::Drawing::Font(L"Segoe UI", 8.0F);
+					chip->Margin = System::Windows::Forms::Padding(3);
+					chip->Cursor = Cursors::Hand;
+					MakeRounded(chip, 8);
+					chip->Tag = st; // store title for click handler
+					chip->Click += gcnew EventHandler(this, &MyForm::btnSimilarChip_Click);
+					flpSim->Controls->Add(chip);
+					added++;
+				}
+				if (added == 0) { lblSim->Visible = false; flpSim->Visible = false; }
+			} catch (...) {
+				lblSim->Visible = false; flpSim->Visible = false;
+			}
+		}
 
 		fd->AcceptButton = btnOk;
 		AppSettings::ApplyTheme(fd);
@@ -1642,8 +1997,21 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 	}
 
 	private: System::Void btnUploadLibraryCard_Click(System::Object^ sender, System::EventArgs^ e) {
-		if (currentReaderId <= 0 || String::IsNullOrWhiteSpace(currentReaderToken)) return;
+		if (String::IsNullOrWhiteSpace(currentReaderToken)) {
+			MessageBox::Show(
+				AppSettings::Translate(L"Karta yuklash uchun avval tizimga kiring.", L"Login first to upload card.", L"Войдите, чтобы загрузить карту."),
+				AppSettings::Translate(L"Kirish kerak", L"Login required", L"Требуется вход"),
+				MessageBoxButtons::OK, MessageBoxIcon::Information
+			);
+			return;
+		}
+		LibraryCardForm^ lcf = gcnew LibraryCardForm(currentReaderToken);
+		AppSettings::ApplyTheme(lcf);
+		lcf->ShowDialog();
+		return;
 
+		// ── Eski inline kod zaxira ──
+		if (currentReaderId <= 0) return;
 		try {
 			WebClient^ libsCl = gcnew WebClient();
 			libsCl->Encoding = System::Text::Encoding::UTF8;
@@ -2268,25 +2636,66 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		txtReview->Size = System::Drawing::Size(360, 70);
 		txtReview->Multiline = true;
 
+		// Yulduzli reyting UI
+		Panel^ starPanel = gcnew Panel();
+		starPanel->Location = Point(20, 44);
+		starPanel->Size = System::Drawing::Size(200, 40);
+		starPanel->BackColor = System::Drawing::Color::Transparent;
+		starPanel->Tag = 5; // default selected rating
+
+		for (int si = 0; si < 5; si++) {
+			Button^ star = gcnew Button();
+			star->Size = System::Drawing::Size(34, 34);
+			star->Location = System::Drawing::Point(si * 38, 3);
+			star->FlatStyle = FlatStyle::Flat;
+			star->FlatAppearance->BorderSize = 0;
+			star->BackColor = System::Drawing::Color::Transparent;
+			star->Font = gcnew System::Drawing::Font(L"Segoe UI", 18.0F);
+			star->Text = L"★";
+			star->ForeColor = System::Drawing::Color::FromArgb(245, 158, 11); // default all gold
+			star->Cursor = System::Windows::Forms::Cursors::Hand;
+			array<Object^>^ starTag = gcnew array<Object^>(2);
+			starTag[0] = (Object^)(si + 1);
+			starTag[1] = starPanel;
+			star->Tag = starTag;
+			star->Click += gcnew System::EventHandler(this, &MyForm::starButton_Click);
+			starPanel->Controls->Add(star);
+		}
+
 		Button^ ok = gcnew Button();
 		ok->Text = AppSettings::Translate(L"Saqlash", L"Save", L"Сохранить");
 		ok->Location = Point(280, 188);
 		ok->Size = System::Drawing::Size(100, 32);
+		ok->BackColor = AppSettings::PrimaryColor();
+		ok->ForeColor = System::Drawing::Color::White;
+		ok->FlatStyle = FlatStyle::Flat;
+		ok->FlatAppearance->BorderSize = 0;
 		ok->DialogResult = System::Windows::Forms::DialogResult::OK;
 
 		Button^ cancel = gcnew Button();
 		cancel->Text = AppSettings::Translate(L"Bekor", L"Cancel", L"Отмена");
 		cancel->Location = Point(170, 188);
 		cancel->Size = System::Drawing::Size(100, 32);
+		cancel->FlatStyle = FlatStyle::Flat;
+		cancel->FlatAppearance->BorderSize = 1;
 		cancel->DialogResult = System::Windows::Forms::DialogResult::Cancel;
 
-		dlg->Controls->Add(lbl); dlg->Controls->Add(num);
+		dlg->Controls->Add(lbl); dlg->Controls->Add(starPanel);
 		dlg->Controls->Add(lbl2); dlg->Controls->Add(txtReview);
 		dlg->Controls->Add(ok); dlg->Controls->Add(cancel);
 		dlg->AcceptButton = ok; dlg->CancelButton = cancel;
+		dlg->Tag = starPanel;
 		AppSettings::ApplyTheme(dlg);
 
 		if (dlg->ShowDialog() != System::Windows::Forms::DialogResult::OK) return;
+
+		int finalRating = 5;
+		{
+			Panel^ sp = dynamic_cast<Panel^>(dlg->Tag);
+			if (sp != nullptr && sp->Tag != nullptr) {
+				try { finalRating = (int)sp->Tag; } catch (...) { finalRating = 5; }
+			}
+		}
 
 		try {
 			WebClient^ cl = gcnew WebClient();
@@ -2295,22 +2704,113 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			cl->Headers->Add("Authorization", "Bearer " + currentReaderToken);
 			cl->Headers->Add("X-Reader-Token", currentReaderToken);
 			String^ payload = String::Format("{{\"rating\":{0},\"review\":\"{1}\"}}",
-				(int)num->Value, EscapeJson(txtReview->Text));
+				finalRating, EscapeJson(txtReview->Text));
 			cl->UploadString(apiUrl + "books/" + bookIdText + "/rate/", "POST", payload);
-			MessageBox::Show(
-				AppSettings::Translate(L"Rahmat! Reytingingiz saqlandi.", L"Thanks! Your rating is saved.", L"Спасибо! Ваша оценка сохранена."),
-				AppSettings::Translate(L"Tayyor", L"Done", L"Готово"),
-				MessageBoxButtons::OK,
-				MessageBoxIcon::Information
-			);
+			ShowToast(AppSettings::Translate(L"★ Reyting saqlandi!", L"★ Rating saved!", L"★ Оценка сохранена!"), L"success");
 		}
 		catch (Exception^ ex) {
-			MessageBox::Show(
-				AppSettings::Translate(L"Baholashda xatolik: ", L"Rating error: ", L"Ошибка оценки: ") + ex->Message,
-				AppSettings::Translate(L"Xatolik", L"Error", L"Ошибка"),
-				MessageBoxButtons::OK,
-				MessageBoxIcon::Error
-			);
+			ShowToast(AppSettings::Translate(L"Baholashda xato: ", L"Rating error: ", L"Ошибка: ") + ex->Message, L"error");
+			}
+	}
+
+	// ─────────────────────────────────────────────────────────────────────────
+	// Toast bildirisnoma
+	// ─────────────────────────────────────────────────────────────────────────
+	public: System::Void ShowToast(String^ msg, String^ type) {
+		if (_toastPanel == nullptr || _toastLabel == nullptr) return;
+		System::Drawing::Color bg, fg;
+		if (type == L"success") { bg = System::Drawing::Color::FromArgb(22, 163, 74);  fg = System::Drawing::Color::White; }
+		else if (type == L"error") { bg = System::Drawing::Color::FromArgb(220, 38, 38);  fg = System::Drawing::Color::White; }
+		else if (type == L"warning") { bg = System::Drawing::Color::FromArgb(217, 119, 6);  fg = System::Drawing::Color::White; }
+		else                        { bg = System::Drawing::Color::FromArgb(37, 99, 235);   fg = System::Drawing::Color::White; }
+		_toastLabel->Text = msg;
+		_toastPanel->BackColor = bg;
+		_toastLabel->ForeColor = fg;
+		int tw = Math::Min(340, this->ClientSize.Width - 40);
+		_toastPanel->Size = System::Drawing::Size(tw, 50);
+		_toastPanel->Location = System::Drawing::Point(
+			this->ClientSize.Width - tw - 20,
+			this->ClientSize.Height - 70
+		);
+		AppSettings::MakeRounded(_toastPanel, 10);
+		_toastPanel->BringToFront();
+		_toastPanel->Visible = true;
+		if (_toastTimer != nullptr) { _toastTimer->Stop(); _toastTimer->Start(); }
+	}
+
+	private: System::Void toastTimer_Tick(System::Object^ sender, System::EventArgs^ e) {
+		if (_toastTimer != nullptr) _toastTimer->Stop();
+		if (_toastPanel != nullptr) _toastPanel->Visible = false;
+	}
+
+	// ─────────────────────────────────────────────────────────────────────────
+	// Klaviatura yorliqlari: Ctrl+F qidiruv, F5 yangilash
+	// ─────────────────────────────────────────────────────────────────────────
+	protected: virtual bool ProcessCmdKey(System::Windows::Forms::Message% msg, System::Windows::Forms::Keys keyData) override {
+		if (keyData == (System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::F)) {
+			if (txtSearch != nullptr) { txtSearch->Focus(); txtSearch->SelectAll(); }
+			return true;
+		}
+		if (keyData == System::Windows::Forms::Keys::F5) {
+			LoadBooksToGrid();
+			return true;
+		}
+		if (keyData == (System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::R)) {
+			LoadBooksToGrid();
+			return true;
+		}
+		return Form::ProcessCmdKey(msg, keyData);
+	}
+
+	// ─────────────────────────────────────────────────────────────────────────
+	// Navbatga yozilish handler
+	// ─────────────────────────────────────────────────────────────────────────
+	private: System::Void btnWaitlist_Click(System::Object^ sender, System::EventArgs^ e) {
+		Button^ btn = dynamic_cast<Button^>(sender);
+		if (btn == nullptr || btn->Tag == nullptr) return;
+		array<Object^>^ res = dynamic_cast<array<Object^>^>(btn->Tag);
+		if (res == nullptr || res->Length < 13) return;
+		if (!EnsureReaderCanReserve()) return;
+
+		String^ bookId = (res[12] != nullptr) ? res[12]->ToString() : L"";
+		if (String::IsNullOrWhiteSpace(bookId)) return;
+
+		try {
+			WebClient^ cl = gcnew WebClient();
+			cl->Encoding = System::Text::Encoding::UTF8;
+			cl->Headers[HttpRequestHeader::ContentType] = "application/json";
+			cl->Headers->Add("Authorization", "Bearer " + currentReaderToken);
+			cl->Headers->Add("X-Reader-Token", currentReaderToken);
+			String^ payload = String::Format("{{\"book\":{0}}}", bookId);
+			cl->UploadString(apiUrl + "waitlist/", "POST", payload);
+			ShowToast(AppSettings::Translate(L"✓ Navbatga yozildingiz!", L"✓ Added to waitlist!", L"✓ Вы добавлены в очередь!"), L"success");
+		}
+		catch (Exception^ ex) {
+			ShowToast(AppSettings::Translate(L"Navbatga yozilishda xato: ", L"Waitlist error: ", L"Ошибка: ") + ex->Message, L"error");
+		}
+	}
+
+	// ─────────────────────────────────────────────────────────────────────────
+	// Yulduz tugmasi bosilganda rang yangilanadi
+	// ─────────────────────────────────────────────────────────────────────────
+	private: System::Void starButton_Click(System::Object^ sender, System::EventArgs^ e) {
+		Button^ btn = dynamic_cast<Button^>(sender);
+		if (btn == nullptr || btn->Tag == nullptr) return;
+		array<Object^>^ tag = dynamic_cast<array<Object^>^>(btn->Tag);
+		if (tag == nullptr || tag->Length < 2) return;
+		int rating = (int)tag[0];
+		Panel^ sp = dynamic_cast<Panel^>(tag[1]);
+		if (sp == nullptr) return;
+		sp->Tag = rating;
+		for each (Control^ c in sp->Controls) {
+			Button^ s = dynamic_cast<Button^>(c);
+			if (s == nullptr) continue;
+			array<Object^>^ st = dynamic_cast<array<Object^>^>(s->Tag);
+			if (st == nullptr) continue;
+			int sv = (int)st[0];
+			s->ForeColor = (sv <= rating)
+				? System::Drawing::Color::FromArgb(245, 158, 11)
+				: System::Drawing::Color::FromArgb(200, 200, 200);
 		}
 	}
 
@@ -2491,6 +2991,11 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		infoForm->ShowDialog();
 	}
 
+	private: System::Void btnLibraries_Click(System::Object^ sender, System::EventArgs^ e) {
+		LibrariesForm^ lf = gcnew LibrariesForm();
+		lf->ShowDialog();
+	}
+
 	private: System::Void btnStat_Click(System::Object^ sender, System::EventArgs^ e) {
 		StatisticsForm^ statForm = gcnew StatisticsForm();
 		AppSettings::ApplyTheme(statForm);
@@ -2503,6 +3008,21 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 			return;
 		}
 
+		// Yangi LoginForm ishlatiladi
+		LoginForm^ lf = gcnew LoginForm();
+		AppSettings::ApplyTheme(lf);
+		if (lf->ShowDialog() == System::Windows::Forms::DialogResult::OK && lf->IsLoggedIn) {
+			currentReaderToken    = lf->ReaderToken;
+			currentReaderName     = lf->ReaderName;
+			currentReaderCardId   = lf->ReaderCardId;
+			currentReaderApproved = lf->ReaderApproved;
+			currentReaderId       = -1; // token-based, ID keyinroq kerak bo'lmaydi
+			UpdateReaderButtonState();
+			LoadBooksToGrid();
+		}
+		return;
+
+		// ── Quyidagi eski inline kod zaxira sifatida saqlanadi ──
 		Form^ prompt = gcnew Form();
 		prompt->Text = AppSettings::Translate(L"Reader autentifikatsiya", L"Reader authentication", L"Аутентификация читателя");
 		prompt->Size = System::Drawing::Size(480, 520);
@@ -2910,6 +3430,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 	}
 
 	private: System::Void btnSearch_Click(System::Object^ sender, System::EventArgs^ e) {
+		if (histPanel != nullptr) histPanel->Visible = false;
 		LoadBooksToGrid();
 	}
 
@@ -2918,8 +3439,10 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		if (e->KeyCode == Keys::Enter) {
 			e->SuppressKeyPress = true;
 			if (searchDebounceTimer != nullptr) searchDebounceTimer->Stop();
+			if (histPanel != nullptr) histPanel->Visible = false;
 			LoadBooksToGrid();
 		}
+		if (e->KeyCode == Keys::Escape && histPanel != nullptr) histPanel->Visible = false;
 	}
 
 	private: System::Void txtSearch_TextChanged(System::Object^ sender, System::EventArgs^ e) {
@@ -3014,6 +3537,7 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 	private: System::Void btnShowAll_Click(System::Object^ sender, System::EventArgs^ e) {
       isUiUpdating = true;
 		txtSearch->Text = L"";
+		if (txtAuthorFilter != nullptr) txtAuthorFilter->Text = L"";
 		if (cmbFilterLibrary->Items->Count > 0) cmbFilterLibrary->SelectedIndex = 0;
 		if (cmbFilterSection->Items->Count > 0) cmbFilterSection->SelectedIndex = 0;
       if (cmbRadius->Items->Count > 0) cmbRadius->SelectedIndex = 0;
@@ -3060,6 +3584,87 @@ private: System::Windows::Forms::Button^ btnStatusIssued;
 		if (lblMarquee->Left > this->ClientSize.Width) {
 			lblMarquee->Left = -lblMarquee->Width;
 		}
+	}
+
+	// ── Sevimlilar ──
+	private: System::Void btnFavourites_Click(System::Object^ sender, System::EventArgs^ e) {
+		FavouritesForm^ ff = gcnew FavouritesForm(serverUrl);
+		AppSettings::ApplyTheme(ff);
+		ff->ShowDialog();
+	}
+
+	private: System::Void btnHeart_Click(System::Object^ sender, System::EventArgs^ e) {
+		Button^ btn = dynamic_cast<Button^>(sender);
+		if (btn == nullptr || btn->Tag == nullptr) return;
+		array<String^>^ parts = dynamic_cast<array<String^>^>(btn->Tag);
+		if (parts == nullptr || parts->Length < 6) return;
+		FavouritesForm::ToggleFav(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]);
+		bool nowFav = FavouritesForm::IsFav(parts[0]);
+		btn->Text = nowFav ? L"❤" : L"♡";
+		btn->BackColor = System::Drawing::Color::FromArgb(nowFav ? 210 : 110, 220, 38, 38);
+	}
+
+	// ── Qidiruv tarixi ──
+	private: System::Void SaveSearchHistory(String^ query) {
+		if (String::IsNullOrWhiteSpace(query)) return;
+		try {
+			String^ dir = System::IO::Path::Combine(
+				Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), L"TATULibrary");
+			if (!System::IO::Directory::Exists(dir)) System::IO::Directory::CreateDirectory(dir);
+			String^ path = System::IO::Path::Combine(dir, L"search_history.txt");
+			auto lines = gcnew System::Collections::Generic::List<String^>();
+			if (System::IO::File::Exists(path)) {
+				for each (String^ l in System::IO::File::ReadAllLines(path, System::Text::Encoding::UTF8))
+					if (!String::IsNullOrWhiteSpace(l) && l->Trim() != query->Trim()) lines->Add(l->Trim());
+			}
+			lines->Insert(0, query->Trim());
+			while (lines->Count > 10) lines->RemoveAt(lines->Count - 1);
+			System::IO::File::WriteAllLines(path, lines->ToArray(), System::Text::Encoding::UTF8);
+		} catch (...) {}
+	}
+
+	private: System::Collections::Generic::List<String^>^ LoadSearchHistory() {
+		auto result = gcnew System::Collections::Generic::List<String^>();
+		try {
+			String^ path = System::IO::Path::Combine(
+				Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData),
+				L"TATULibrary", L"search_history.txt");
+			if (!System::IO::File::Exists(path)) return result;
+			for each (String^ l in System::IO::File::ReadAllLines(path, System::Text::Encoding::UTF8))
+				if (!String::IsNullOrWhiteSpace(l)) result->Add(l->Trim());
+		} catch (...) {}
+		return result;
+	}
+
+	private: System::Void txtSearch_Enter_History(System::Object^ sender, System::EventArgs^ e) {
+		if (histPanel == nullptr || histList == nullptr) return;
+		auto hist = LoadSearchHistory();
+		if (hist->Count == 0) { histPanel->Visible = false; return; }
+		histList->Items->Clear();
+		for each (String^ h in hist) histList->Items->Add(h);
+		int panelH = Math::Min(hist->Count, 6) * 22 + 8;
+		histPanel->Location = System::Drawing::Point(txtSearch->Left, txtSearch->Bottom + 2);
+		histPanel->Size = System::Drawing::Size(Math::Max(txtSearch->Width, 240), panelH);
+		histPanel->Visible = true;
+		histPanel->BringToFront();
+	}
+
+	private: System::Void histList_Click(System::Object^ sender, System::EventArgs^ e) {
+		if (histList == nullptr || histList->SelectedItem == nullptr) return;
+		txtSearch->Text = histList->SelectedItem->ToString();
+		histPanel->Visible = false;
+		LoadBooksToGrid();
+	}
+
+	private: System::Void btnSimilarChip_Click(System::Object^ sender, System::EventArgs^ e) {
+		Button^ btn = dynamic_cast<Button^>(sender);
+		if (btn == nullptr || btn->Tag == nullptr) return;
+		String^ simTitle = btn->Tag->ToString();
+		if (String::IsNullOrWhiteSpace(simTitle)) return;
+		Form^ parentForm = btn->FindForm();
+		if (parentForm != nullptr) parentForm->Close();
+		txtSearch->Text = simTitle;
+		LoadBooksToGrid();
 	}
 
 	};

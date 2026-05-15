@@ -20,6 +20,8 @@ namespace Yakuniyloyiha {
 		static AppLanguage CurrentLanguage = AppLanguage::Uzbek;
 		static bool DarkMode = false;
 
+		static String^ GetApiBase() { return "http://5.189.136.95:81"; }
+
 		static String^ Translate(String^ uz, String^ en, String^ ru) {
 			switch (CurrentLanguage) {
 			case AppLanguage::English: return en;
@@ -76,19 +78,19 @@ namespace Yakuniyloyiha {
 
 		// === CREATIVE PREMIUM GRADIENT SYSTEM ===
 		static Color GradientPrimaryStart() {
-			return DarkMode ? Color::FromArgb(38, 207, 219) : Color::FromArgb(112, 170, 206);
+			return DarkMode ? Color::FromArgb(38, 207, 219) : Color::FromArgb(37, 99, 235);
 		}
 
 		static Color GradientPrimaryEnd() {
-			return DarkMode ? Color::FromArgb(111, 132, 255) : Color::FromArgb(60, 110, 150);
+			return DarkMode ? Color::FromArgb(111, 132, 255) : Color::FromArgb(79, 70, 229);
 		}
 
 		static Color GradientAccentStart() {
-			return DarkMode ? Color::FromArgb(34, 187, 211) : Color::FromArgb(73, 198, 217);
+			return DarkMode ? Color::FromArgb(34, 187, 211) : Color::FromArgb(37, 99, 235);
 		}
 
 		static Color GradientAccentEnd() {
-			return DarkMode ? Color::FromArgb(88, 110, 230) : Color::FromArgb(105, 130, 247);
+			return DarkMode ? Color::FromArgb(88, 110, 230) : Color::FromArgb(124, 58, 237);
 		}
 
 		static Color GradientWarmStart() {
@@ -100,15 +102,23 @@ namespace Yakuniyloyiha {
 		}
 
 		static Color CardHoverColor() {
-			return DarkMode ? Color::FromArgb(46, 69, 111) : Color::FromArgb(53, 71, 89);
+			return DarkMode ? Color::FromArgb(46, 69, 111) : Color::FromArgb(239, 246, 255);
 		}
 
 		static Color CardElevatedColor() {
-			return DarkMode ? Color::FromArgb(38, 53, 85) : Color::FromArgb(245, 245, 250);
+			return DarkMode ? Color::FromArgb(38, 53, 85) : Color::FromArgb(248, 250, 252);
 		}
 
 		static Color SidebarColor() {
-			return DarkMode ? Color::FromArgb(30, 166, 191) : Color::FromArgb(45, 162, 179);
+			return DarkMode ? Color::FromArgb(30, 166, 191) : Color::FromArgb(37, 99, 235);
+		}
+
+		static Color NavbarColor() {
+			return DarkMode ? Color::FromArgb(22, 30, 50) : Color::FromArgb(255, 255, 255);
+		}
+
+		static Color NavbarBorderColor() {
+			return DarkMode ? Color::FromArgb(50, 65, 90) : Color::FromArgb(226, 232, 240);
 		}
 
 		static void ApplyTheme(Form^ form) {
@@ -126,55 +136,55 @@ namespace Yakuniyloyiha {
 		}
 
 		static Color PageBackColor() {
-			return DarkMode ? Color::FromArgb(23, 36, 61) : Color::FromArgb(112, 170, 206);
+			return DarkMode ? Color::FromArgb(15, 23, 42) : Color::FromArgb(241, 245, 249);
 		}
 
 		static Color SurfaceColor() {
-			return DarkMode ? Color::FromArgb(36, 55, 88) : Color::FromArgb(43, 61, 79);
+			return DarkMode ? Color::FromArgb(30, 41, 59) : Color::FromArgb(255, 255, 255);
 		}
 
 		static Color ElevatedColor() {
-			return DarkMode ? Color::FromArgb(44, 65, 101) : Color::FromArgb(245, 245, 250);
+			return DarkMode ? Color::FromArgb(44, 65, 101) : Color::FromArgb(248, 250, 252);
 		}
 
 		static Color TextColor() {
-			return DarkMode ? Color::FromArgb(246, 249, 255) : Color::FromArgb(20, 30, 50);
+			return DarkMode ? Color::FromArgb(241, 245, 249) : Color::FromArgb(15, 23, 42);
 		}
 
 		static Color MutedTextColor() {
-			return DarkMode ? Color::FromArgb(169, 186, 212) : Color::FromArgb(60, 80, 100);
+			return DarkMode ? Color::FromArgb(148, 163, 184) : Color::FromArgb(100, 116, 139);
 		}
 
 		static Color BorderColor() {
-			return DarkMode ? Color::FromArgb(71, 101, 142) : Color::FromArgb(45, 162, 179);
+			return DarkMode ? Color::FromArgb(51, 65, 85) : Color::FromArgb(226, 232, 240);
 		}
 
 		static Color PrimaryColor() {
-			return DarkMode ? Color::FromArgb(78, 127, 255) : Color::FromArgb(45, 162, 179);
+			return DarkMode ? Color::FromArgb(96, 165, 250) : Color::FromArgb(37, 99, 235);
 		}
 
 		static Color PrimaryHoverColor() {
-			return DarkMode ? Color::FromArgb(106, 151, 255) : Color::FromArgb(35, 142, 159);
+			return DarkMode ? Color::FromArgb(147, 197, 253) : Color::FromArgb(29, 78, 216);
 		}
 
 		static Color PrimaryTextColor() {
-			return DarkMode ? Color::FromArgb(10, 20, 40) : Color::White;
+			return Color::White;
 		}
 
 		static Color SecondaryColor() {
-			return DarkMode ? Color::FromArgb(232, 198, 104) : Color::FromArgb(255, 180, 80);
+			return DarkMode ? Color::FromArgb(232, 198, 104) : Color::FromArgb(245, 158, 11);
 		}
 
 		static Color SuccessColor() {
-			return DarkMode ? Color::FromArgb(50, 220, 120) : Color::FromArgb(30, 180, 100);
+			return DarkMode ? Color::FromArgb(74, 222, 128) : Color::FromArgb(22, 163, 74);
 		}
 
 		static Color DangerColor() {
-			return DarkMode ? Color::FromArgb(255, 80, 100) : Color::FromArgb(220, 50, 50);
+			return DarkMode ? Color::FromArgb(248, 113, 113) : Color::FromArgb(220, 38, 38);
 		}
 
 		static Color WarningColor() {
-			return DarkMode ? Color::FromArgb(255, 200, 80) : Color::FromArgb(255, 140, 0);
+			return DarkMode ? Color::FromArgb(251, 191, 36) : Color::FromArgb(217, 119, 6);
 		}
 
 		static void MakeRounded(Control^ ctrl, int radius) {
@@ -232,20 +242,20 @@ namespace Yakuniyloyiha {
 			if (btn == nullptr) return;
 			btn->FlatStyle = FlatStyle::Flat;
 			btn->FlatAppearance->BorderSize = 0;
-			btn->Font = gcnew Drawing::Font(L"Segoe UI Semibold", 11.0F, FontStyle::Bold);
+			btn->Font = gcnew Drawing::Font(L"Segoe UI Semibold", 10.0F, FontStyle::Bold);
 			btn->Cursor = Cursors::Hand;
-			btn->Height = 44;
-			MakeRounded(btn, 12);
+			btn->Height = 36;
+			MakeRounded(btn, 8);
 
 			if (isPrimary) {
 				btn->BackColor = PrimaryColor();
-				btn->ForeColor = PrimaryTextColor();
+				btn->ForeColor = Color::White;
 				btn->FlatAppearance->MouseOverBackColor = PrimaryHoverColor();
 			}
 			else {
-				btn->BackColor = ElevatedColor();
+				btn->BackColor = SurfaceColor();
 				btn->ForeColor = TextColor();
-				btn->FlatAppearance->BorderSize = 2;
+				btn->FlatAppearance->BorderSize = 1;
 				btn->FlatAppearance->BorderColor = BorderColor();
 				btn->FlatAppearance->MouseOverBackColor = CardHoverColor();
 			}
@@ -310,18 +320,18 @@ namespace Yakuniyloyiha {
 
 		static void StyleInput(Control^ input) {
 			if (input == nullptr) return;
-			input->BackColor = Color::White;
-			input->ForeColor = Color::Black;
-			input->Font = gcnew Drawing::Font(L"Segoe UI", 10.5F, FontStyle::Regular);
+			input->BackColor = DarkMode ? Color::FromArgb(30, 41, 59) : Color::White;
+			input->ForeColor = DarkMode ? Color::FromArgb(241, 245, 249) : Color::FromArgb(15, 23, 42);
+			input->Font = gcnew Drawing::Font(L"Segoe UI", 10.0F, FontStyle::Regular);
 			TextBox^ tb = dynamic_cast<TextBox^>(input);
 			if (tb != nullptr) {
 				tb->BorderStyle = BorderStyle::FixedSingle;
-				tb->ForeColor = Color::Black;
+				tb->ForeColor = DarkMode ? Color::FromArgb(241, 245, 249) : Color::FromArgb(15, 23, 42);
 			}
 			ComboBox^ cb = dynamic_cast<ComboBox^>(input);
 			if (cb != nullptr) {
 				cb->FlatStyle = FlatStyle::Flat;
-				cb->ForeColor = Color::Black;
+				cb->ForeColor = DarkMode ? Color::FromArgb(241, 245, 249) : Color::FromArgb(15, 23, 42);
 			}
 		}
 
@@ -353,11 +363,9 @@ namespace Yakuniyloyiha {
 
 		static void StyleModernCard(Panel^ card, bool isElevated) {
 			if (card == nullptr) return;
-			card->BackColor = isElevated ? CardElevatedColor() : SurfaceColor();
-			MakeRounded(card, 18);
-			if (isElevated) {
-				card->BorderStyle = BorderStyle::FixedSingle;
-			}
+			card->BackColor = SurfaceColor();
+			MakeRounded(card, 12);
+			card->BorderStyle = BorderStyle::FixedSingle;
 		}
 
 		static Panel^ CreatePremiumCard(int width, int height, int radius, Color bgColor) {
@@ -405,7 +413,13 @@ namespace Yakuniyloyiha {
 			for each (Control ^ c in controls) {
 				if (dynamic_cast<Button^>(c) != nullptr) {
 					Button^ btn = (Button^)c;
-					StyleButton(btn, PrimaryColor(), Color::White);
+					// Only override if button has default back color (skip manually styled buttons)
+					if (btn->DialogResult == System::Windows::Forms::DialogResult::OK
+					    || btn->DialogResult == System::Windows::Forms::DialogResult::Cancel)
+						StyleButton(btn, (btn->DialogResult == System::Windows::Forms::DialogResult::OK) ? PrimaryColor() : ElevatedColor(),
+						            (btn->DialogResult == System::Windows::Forms::DialogResult::OK) ? Color::White : TextColor());
+					else
+						StyleButton(btn, ElevatedColor(), TextColor());
 				}
 				else if (dynamic_cast<TextBox^>(c) != nullptr) {
 					StyleInput(c);
